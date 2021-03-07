@@ -1,0 +1,58 @@
+﻿@page "/auth/login"
+
+@layout AuthLayout
+
+@inject AuthenticationService  authService
+@inject NavigationManager navigationManager
+
+<div style="max-width: 400px;">
+    <h3>Create a new user</h3>
+    <EditForm Model="@model" OnValidSubmit="LoginUser">
+        <MudCard>
+            <AlertMessage Message="@message" MessageType="@messageType" />
+            <DataAnnotationsValidator />
+            <MudCardContent>
+                <MudTextField Label="Email" HelperText="Enter a valid email" Class="mt-3"
+                              @bind-Value="model.Email" For="@(() => model.Email)" />
+                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                              @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+            </MudCardContent>
+            <br />
+            <MudCardActions>
+                <MudButton FullWidth="true" ButtonType="MudBlazor.ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="isBusy" Class="ml-auto">Login</MudButton>
+            </MudCardActions>
+            <MudCardActions>
+                <MudButton FullWidth="true" ButtonType="MudBlazor.ButtonType.Button" Variant="Variant.Filled" Color="Color.Secondary" Disabled="isBusy" OnClick="GoToRegister" Class="ml-auto">Do not have an account? Sign up</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</div>
+@code {
+
+    LoginRequest model = new LoginRequest();
+
+    bool isBusy = false;
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    public async Task LoginUser()
+    {
+        isBusy = true;
+        var result = await authService.LoginUserAsync(model);
+        if (result.IsSuccess)
+        {
+            navigationManager.NavigateTo("/");
+        }
+        else
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+    }
+
+    void GoToRegister()
+    {
+        navigationManager.NavigateTo("/auth/register");
+    }
+}

@@ -1,0 +1,61 @@
+﻿@page "/auth/register"
+@layout AuthLayout
+@inject AuthenticationService authService
+@inject NavigationManager navigationManager
+
+<div style="max-width: 400px;">
+    <h3>Create a new user</h3>
+    <EditForm Model="@model" OnValidSubmit="RegisterUser">
+        <MudCard>
+            <AlertMessage Message="@message" MessageType="@messageType" />
+            <DataAnnotationsValidator />
+            <MudCardContent>
+                <MudTextField Label="First name" HelperText="Max. 25 chart"
+                              @bind-Value="model.FirstName" For="@(() => model.FirstName)" />
+                <MudTextField Label="Last name" HelperText="Max. 25 chart"
+                              @bind-Value="model.LastName" For="@(() => model.LastName)" />
+                <MudTextField Label="Email" HelperText="Enter a valid email" Class="mt-3"
+                              @bind-Value="model.Email" For="@(() => model.Email)" />
+                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                              @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+                <MudTextField Label="Confirm Password" HelperText="Repeat your password" Class="mt-3"
+                              @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" />
+            </MudCardContent>
+            <br />
+            <MudCardActions>
+                <MudButton FullWidth="true" ButtonType="MudBlazor.ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="isBusy" Class="ml-auto">Register</MudButton>
+            </MudCardActions>
+            <MudCardActions>
+                <MudButton FullWidth="true" ButtonType="MudBlazor.ButtonType.Button" Variant="Variant.Filled" Color="Color.Secondary" Disabled="isBusy" OnClick="GoToLogin" Class="ml-auto">Already have an account? Login</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</div>
+
+@code {
+    RegisterRequest model = new RegisterRequest();
+    bool isBusy = false;
+    string message = string.Empty;
+    Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+    public async Task RegisterUser()
+    {
+        isBusy = true;
+        var result = await authService.RegisterUserAsync(model);
+        if (result.IsSuccess)
+        {
+            message = result.Message;
+            messageType = Models.AlertMessageType.Success;
+        }
+        else
+        {
+            message = result.Errors.FirstOrDefault() ?? result.Message;
+            messageType = Models.AlertMessageType.Error;
+        }
+        isBusy = false;
+    }
+
+    void GoToLogin()
+    {
+        navigationManager.NavigateTo("/auth/login");
+    }
+}
