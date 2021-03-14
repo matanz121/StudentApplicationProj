@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using MudBlazor.Services;
+using StudentsApplicationProj.Server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace StudentsApplicationProj.Server
 {
@@ -27,6 +29,7 @@ namespace StudentsApplicationProj.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddMudServices();
+            services.AddDbContext<StudentDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StudentDbConnectionString")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
