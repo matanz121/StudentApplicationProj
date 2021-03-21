@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentsApplicationProj.Server.Models;
 
 namespace StudentsApplicationProj.Server.Migrations
 {
     [DbContext(typeof(StudentDbContext))]
-    partial class StudentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210321065641_FixDepartmentHeadDuplicateKey")]
+    partial class FixDepartmentHeadDuplicateKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -84,9 +86,6 @@ namespace StudentsApplicationProj.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("DepartmentHeadId")
-                        .HasColumnType("int");
 
                     b.Property<string>("DepartmentName")
                         .IsRequired()
@@ -174,12 +173,19 @@ namespace StudentsApplicationProj.Server.Migrations
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DepartmentId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserAccountId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
+
+                    b.HasIndex("DepartmentId1")
+                        .IsUnique()
+                        .HasFilter("[DepartmentId1] IS NOT NULL");
 
                     b.HasIndex("UserAccountId");
 
@@ -309,6 +315,10 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasForeignKey("DepartmentId")
                         .IsRequired();
 
+                    b.HasOne("StudentsApplicationProj.Server.Models.Department", null)
+                        .WithOne("DepartmentHead")
+                        .HasForeignKey("StudentsApplicationProj.Server.Models.SystemUser", "DepartmentId1");
+
                     b.HasOne("StudentsApplicationProj.Server.Models.UserAccount", "UserAccount")
                         .WithMany()
                         .HasForeignKey("UserAccountId")
@@ -333,6 +343,8 @@ namespace StudentsApplicationProj.Server.Migrations
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.Department", b =>
                 {
                     b.Navigation("Courses");
+
+                    b.Navigation("DepartmentHead");
 
                     b.Navigation("DepartmentUsers");
                 });

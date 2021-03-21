@@ -12,12 +12,13 @@ namespace StudentsApplicationProj.Server.Mapper
             builder.HasKey(x => x.Id);
             builder.HasIndex(x => x.DepartmentId);
             builder.Property(x => x.CourseName).IsRequired().HasColumnType("nvarchar(128)");
+            builder.Property(x => x.Grade).IsRequired().HasColumnType("float");
             builder.Property(x => x.DepartmentId).IsRequired().HasColumnType("int");
             builder.Property(x => x.CourseInstructorId).HasColumnType("int");
-            
-            builder.HasMany(course => course.StudentCourse)
-                .WithOne(studentCourse => studentCourse.Course)
-                .HasForeignKey(course => course.CourseId)
+
+            builder.HasOne(course => course.Department)
+                .WithMany(department => department.Courses)
+                .HasForeignKey(course => course.DepartmentId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
