@@ -13,6 +13,11 @@ namespace StudentsApplicationProj.Server.Mapper
             builder.HasIndex(x => x.DepartmentId);
             builder.Property(x => x.DepartmentId).IsRequired().HasColumnType("int");
             builder.Property(x => x.UserAccountId).IsRequired().HasColumnType("int");
+
+            builder.HasOne(user => user.Department)
+               .WithMany(department => department.DepartmentUsers)
+               .HasForeignKey(user => user.DepartmentId)
+               .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

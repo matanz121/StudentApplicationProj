@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentsApplicationProj.Server.Models;
 
 namespace StudentsApplicationProj.Server.Migrations
 {
     [DbContext(typeof(StudentDbContext))]
-    partial class StudentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210321065641_FixDepartmentHeadDuplicateKey")]
+    partial class FixDepartmentHeadDuplicateKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,15 +58,13 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ApplicationBody")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(1024)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ApplicationDateTime")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ApplicationName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -87,9 +87,6 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("DepartmentHeadId")
-                        .HasColumnType("int");
-
                     b.Property<string>("DepartmentName")
                         .IsRequired()
                         .HasColumnType("nvarchar(128)");
@@ -97,13 +94,6 @@ namespace StudentsApplicationProj.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Department");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            DepartmentName = "Computer Science and Engineering"
-                        });
                 });
 
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.FileUrl", b =>
@@ -117,11 +107,10 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(258)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -184,12 +173,19 @@ namespace StudentsApplicationProj.Server.Migrations
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DepartmentId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserAccountId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DepartmentId");
+
+                    b.HasIndex("DepartmentId1")
+                        .IsUnique()
+                        .HasFilter("[DepartmentId1] IS NOT NULL");
 
                     b.HasIndex("UserAccountId");
 
@@ -233,18 +229,6 @@ namespace StudentsApplicationProj.Server.Migrations
                         .IsUnique();
 
                     b.ToTable("UserAccount");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AccountStatus = true,
-                            Email = "admin@gmail.com",
-                            FirstName = "Admin First",
-                            LastName = "Admin Last",
-                            Password = "342IHFCmkWx+4Auu8lDJhQoxcv3QA/pfVNsGeKqEGFo=",
-                            UserRole = 4
-                        });
                 });
 
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.Course", b =>
@@ -331,6 +315,10 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasForeignKey("DepartmentId")
                         .IsRequired();
 
+                    b.HasOne("StudentsApplicationProj.Server.Models.Department", null)
+                        .WithOne("DepartmentHead")
+                        .HasForeignKey("StudentsApplicationProj.Server.Models.SystemUser", "DepartmentId1");
+
                     b.HasOne("StudentsApplicationProj.Server.Models.UserAccount", "UserAccount")
                         .WithMany()
                         .HasForeignKey("UserAccountId")
@@ -355,6 +343,8 @@ namespace StudentsApplicationProj.Server.Migrations
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.Department", b =>
                 {
                     b.Navigation("Courses");
+
+                    b.Navigation("DepartmentHead");
 
                     b.Navigation("DepartmentUsers");
                 });

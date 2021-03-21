@@ -9,6 +9,7 @@ using System.Linq;
 using MudBlazor.Services;
 using StudentsApplicationProj.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using StudentsApplicationProj.Server.Services;
 
 namespace StudentsApplicationProj.Server
 {
@@ -29,6 +30,8 @@ namespace StudentsApplicationProj.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddMudServices();
+            services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<ITokenService, TokenService>();
             services.AddDbContext<StudentDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StudentDbConnectionString")));
         }
 

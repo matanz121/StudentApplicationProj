@@ -7,6 +7,7 @@ namespace StudentsApplicationProj.Server.Models
     {
         public int Id { get; set; }
         public string CourseName { get; set; }
+        public float Grade { get; set; }
         public SystemUser CourseInstructor { get; set; }
         public int? CourseInstructorId { get; set; }
         public IList<StudentCourse> StudentCourse { get; set; }

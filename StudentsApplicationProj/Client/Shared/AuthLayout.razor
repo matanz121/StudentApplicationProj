@@ -15,16 +15,6 @@
             <MudTooltip Text="Toggle light/dark theme">
                 <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="Color.Inherit" OnClick="@((e) => DarkMode())" />
             </MudTooltip>
-            <MudMenu>
-                <ActivatorContent>
-                    <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">Account</MudChip>
-                </ActivatorContent>
-                <ChildContent>
-                    <MudMenuItem Link="/user/${}" Target="_blank">Your name</MudMenuItem>
-                    <MudMenuItem Link="/user/${}" Target="_blank">Settings</MudMenuItem>
-                    <MudMenuItem Link="/user/${}" Target="_blank">Login/Logout/</MudMenuItem>
-                </ChildContent>
-            </MudMenu>
         </MudHidden>
     </MudAppBar>
 </MudLayout>

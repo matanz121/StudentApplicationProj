@@ -13,8 +13,11 @@ namespace StudentsApplicationProj.Server.Mapper
             builder.HasIndex(x => x.CourseId);
             builder.Property(x => x.CourseId).IsRequired().HasColumnType("int");
             builder.Property(x => x.StudentId).IsRequired().HasColumnType("int");
-            builder.Property(x => x.Status).IsRequired().HasColumnType("int");
-            builder.Property(x => x.ApplicationDateTime).HasColumnType("date");
+
+            builder.HasOne(studentCourse => studentCourse.Course)
+                .WithMany(course => course.StudentCourse)
+                .HasForeignKey(studentCourse => studentCourse.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

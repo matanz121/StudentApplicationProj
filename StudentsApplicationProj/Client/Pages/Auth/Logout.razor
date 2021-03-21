@@ -1,0 +1,12 @@
+﻿@page "/auth/logout"
+@layout AuthLayout
+
+
+@inject IClientAuthService _clientAuthService
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await _clientAuthService.Logout();
+    }
+}
