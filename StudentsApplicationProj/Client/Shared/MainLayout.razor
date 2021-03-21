@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject IClientAuthService _clientAuthService
+
+
 <MudThemeProvider Theme="currentTheme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -20,9 +23,16 @@
                     <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">Account</MudChip>
                 </ActivatorContent>
                 <ChildContent>
-                    <MudMenuItem Link="/user/${}" Target="_blank">Your name</MudMenuItem>
-                    <MudMenuItem Link="/user/${}" Target="_blank">Settings</MudMenuItem>
-                    <MudMenuItem Link="/user/${}" Target="_blank">Login/Logout/</MudMenuItem>
+                    @if (_clientAuthService.User != null)
+                    {
+                        <MudMenuItem>@_clientAuthService.User.Name</MudMenuItem>
+                        <MudMenuItem Link="/user/${}" Target="_blank">Settings</MudMenuItem>
+                        <MudMenuItem Link="/auth/logout">Log Out</MudMenuItem>
+                    }
+                    else
+                    {
+                        <MudMenuItem Link="/auth/login">Login</MudMenuItem>
+                    }
                 </ChildContent>
             </MudMenu>
         </MudHidden>

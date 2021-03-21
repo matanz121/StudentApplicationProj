@@ -1,7 +1,8 @@
 ﻿@page "/auth/register"
 @layout AuthLayout
-@inject AuthenticationService authService
+@inject IClientAuthService  _clientAuthService
 @inject NavigationManager navigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <div style="max-width: 400px;">
     <h3>Create a new user</h3>
@@ -40,18 +41,20 @@
     public async Task RegisterUser()
     {
         isBusy = true;
-        var result = await authService.RegisterUserAsync(model);
-        if (result.IsSuccess)
+        try
         {
-            message = result.Message;
-            messageType = Models.AlertMessageType.Success;
+            await _clientAuthService.Register(model);
+            navigationManager.NavigateTo("/");
         }
-        else
+        catch
         {
-            message = result.Errors.FirstOrDefault() ?? result.Message;
+            message = "Something went wrong, Please try again";
             messageType = Models.AlertMessageType.Error;
         }
-        isBusy = false;
+        finally
+        {
+            isBusy = false;
+        }
     }
 
     void GoToLogin()

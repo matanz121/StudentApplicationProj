@@ -2,8 +2,9 @@
 
 @layout AuthLayout
 
-@inject AuthenticationService  authService
+@inject IClientAuthService _clientAuthService
 @inject NavigationManager navigationManager
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <div style="max-width: 400px;">
     <h3>Create a new user</h3>
@@ -38,17 +39,20 @@
     public async Task LoginUser()
     {
         isBusy = true;
-        var result = await authService.LoginUserAsync(model);
-        if (result.IsSuccess)
+        try
         {
+            await _clientAuthService.Login(model);
             navigationManager.NavigateTo("/");
         }
-        else
+        catch
         {
-            message = result.Message;
+            message = "Wrong email password combination";
             messageType = Models.AlertMessageType.Error;
         }
-        isBusy = false;
+        finally
+        {
+            isBusy = false;
+        }
     }
 
     void GoToRegister()
