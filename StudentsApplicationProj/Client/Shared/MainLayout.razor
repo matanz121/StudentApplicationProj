@@ -39,9 +39,10 @@
     </MudAppBar>
 
 
-    <MudDrawer @bind-Open=_drawerOpen Elevation="25" Class="stud-appbar-band">
-        <MudDrawerHeader Class="stud-brand" LinkToIndex="true">
-            @*<MudBlazorLogo />*@
+    <MudDrawer @bind-Open=_drawerOpen Elevation="25">
+        <MudDrawerHeader LinkToIndex="true">
+            <img class="studband" src="images\AchvaLogo.png"
+                 style="margin-top: -14px;margin-left: -22px; width: 207px; height: 80px">
         </MudDrawerHeader>
         <NavMenu />
     </MudDrawer>
