@@ -7,6 +7,10 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'StudentsApplicationProj' ">
     <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.4" />
