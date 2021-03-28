@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StudentsApplicationProj.Server.Models;
+using StudentsApplicationProj.Shared.Enum;
 using System;
 using System.Text;
 

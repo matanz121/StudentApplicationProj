@@ -26,12 +26,16 @@ namespace StudentsApplicationProj.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddAutoMapper(typeof(Startup));
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddMudServices();
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IStudentService, StudentService>();
+            services.AddTransient<IDepartmentHeadService, DepartmentHeadService>();
+            services.AddTransient<IInstructorService, InstructorService>();
+            services.AddTransient<IAdminService, AdminService>();
             services.AddDbContext<StudentDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StudentDbConnectionString")));
         }
 

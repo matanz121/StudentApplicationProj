@@ -1,0 +1,12 @@
+﻿@page "/reports"
+@inject IClientAuthService _clientAuthService
+
+@(_clientAuthService.User != null && _clientAuthService.User.UserRole == UserRole.Student)
+{
+    
+}
+
+@code {
+    public ApplicationRequestFormModel Model { get; set; } = new ApplicationRequestFormModel();
+
+}

@@ -25,7 +25,7 @@ namespace StudentsApplicationProj.Server.Services
         {
             var hashedPassword = HashPassword(loginModel.Password);
             return _context.UserAccount
-                .Where(x => x.Email == loginModel.Email && x.Password == hashedPassword)
+                .Where(x => x.Email == loginModel.Email && x.Password == hashedPassword && x.AccountStatus == true)
                 .FirstOrDefault();
         }
 
@@ -40,7 +40,7 @@ namespace StudentsApplicationProj.Server.Services
                     Password = HashPassword(registerModel.Password),
                     FirstName = registerModel.FirstName,
                     LastName = registerModel.LastName,
-                    UserRole = UserRole.Student,
+                    UserRole = registerModel.UserRole,
                     AccountStatus = false
                 }
             };
