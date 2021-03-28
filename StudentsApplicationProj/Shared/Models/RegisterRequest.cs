@@ -6,6 +6,7 @@ namespace StudentsApplicationProj.Shared.Models
 {
     public class RegisterRequest
     {
+        public int Id { get; set; }
         [Required]
         [StringLength(50)]
         [EmailAddress]

@@ -29,9 +29,6 @@ namespace StudentsApplicationProj.Client
             
             var host = builder.Build();
             
-            var authenticationService = host.Services.GetRequiredService<IClientAuthService>();
-            await authenticationService.Initialize();
-
             await host.RunAsync();
         }
     }
