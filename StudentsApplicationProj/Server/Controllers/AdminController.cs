@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Server.Services;
 using StudentsApplicationProj.Shared.Models;
-
+using System.Collections.Generic;
 
 namespace StudentsApplicationProj.Server.Controllers
 {
@@ -28,7 +28,12 @@ namespace StudentsApplicationProj.Server.Controllers
 
         [HttpGet, Route("instructors/{departmentId}")]
         public IActionResult GetInstructors(int departmentId) => Ok(
-                _mapper.Map<UserAccountModel>(_adminService.GetInstructors(departmentId))
+                _mapper.Map<List<UserAccountModel>>(_adminService.GetInstructors(departmentId))
+            );
+
+        [HttpGet, Route("accountsToApprove")]
+        public IActionResult GetAccountsToApprove() => Ok(
+                _mapper.Map<List<UserAccountModel>>(_adminService.GetAccountsToApprove())
             );
 
         [HttpPost, Route("course")]
@@ -38,29 +43,18 @@ namespace StudentsApplicationProj.Server.Controllers
             var status = _adminService.AddCourse(course);
             if (status)
             {
-                return Ok();
+                return Ok(courseModel);
             }
             return BadRequest();
         }
 
-        [HttpPost, Route("accounts")]
+        [HttpPut, Route("accounts")]
         public IActionResult ApproveAccount(UserModel user)
         {
             var status = _adminService.ApproveAccount(user.Id);
             if (status)
             {
-                return Ok();
-            }
-            return BadRequest();
-        }
-
-        [HttpGet, Route("course/assign/{courseId}/{instructorId}")]
-        public IActionResult ApproveAccount(int courseId, int instructorId)
-        {
-            var status = _adminService.AssignCourse(courseId, instructorId);
-            if (status)
-            {
-                return Ok();
+                return Ok(user);
             }
             return BadRequest();
         }

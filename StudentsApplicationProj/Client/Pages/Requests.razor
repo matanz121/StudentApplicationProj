@@ -1,5 +1,127 @@
 ﻿@page "/requests"
+@inject IClientAuthService _authService
+@inject IHttpService _httpService
+@inject NavigationManager _navigationManager
+@inject ISnackbar _snackbar
+
+<MudTable Items="@ApplicationRequests" Bordered="true" Striped="true">
+    <HeaderContent>
+        <MudTh>Student Name</MudTh>
+        <MudTh>Course Name</MudTh>
+        <MudTh>Application Name</MudTh>
+        <MudTh>Application Body</MudTh>
+        <MudTh>Date</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Student.Name</MudTd>
+        <MudTd>@context.Course.CourseName</MudTd>
+        <MudTd>@context.ApplicationName</MudTd>
+        <MudTd>@context.ApplicationBody</MudTd>
+        <MudTd>@context.ApplicationDateTime</MudTd>
+        @if (_authService.User != null && _authService.User.UserRole != UserRole.Student)
+        {
+            <MudTd>
+                <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" OnClick="@(() => AcceptAppealOrDecline(context.Id, true))">Accept</MudButton>
+                <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Secondary" OnClick="@(() => AcceptAppealOrDecline(context.Id, false))">Declined</MudButton>
+            </MudTd>
+        }
+        else if (context.Status == ApplicationStatus.Declined)
+        {
+            <MudTd>
+                <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" OnClick="@(() => AcceptAppealOrDecline(context.Id, true))">Appeal</MudButton>
+            </MudTd>
+        }
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
+    private List<CourseApplicationViewModel> ApplicationRequests { get; set; } = new();
+    private bool IsLoading { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_authService.User != null)
+        {
+            try
+            {
+                ApplicationRequests = await _httpService.Get<List<CourseApplicationViewModel>>("/api/application");
+            }
+            catch
+            {
+                ApplicationRequests = new ();
+            }
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/");
+        }
+    }
+
+    private string GetAcceptDeclineUrl()
+    {
+        var role = _authService.User.UserRole;
+        if (role == UserRole.Administrator || role == UserRole.DepartmentHead)
+        {
+            return "/api/DepartmentHead/acceptOrDecline";
+        }
+        else if (role == UserRole.Instructor)
+        {
+            return "/api/Instructor/acceptOrDecline";
+        }
+        else
+        {
+            return "/api/student/appeal";
+        }
+    }
+
+    private CourseApplicationViewModel GetCourseApplicationViewModel(int id, bool status)
+    {
+        var role = _authService.User.UserRole;
+        var model = new CourseApplicationViewModel()
+        {
+            Id = id
+        };
+        if (role == UserRole.Administrator || role == UserRole.DepartmentHead)
+        {
+            model.Status = status ? ApplicationStatus.ApprovedByAll : ApplicationStatus.Declined;
+        }
+        else if (role == UserRole.Instructor)
+        {
+            model.Status = status ? ApplicationStatus.ApprovedByInstructor : ApplicationStatus.Declined;
+        }
+        else
+        {
+            model.Status = ApplicationStatus.Created;
+        }
+        return model;
+    }
+
+    private async Task AcceptAppealOrDecline(int applicationId, bool status)
+    {
+        try
+        {
+            var url = this.GetAcceptDeclineUrl();
+            var model = this.GetCourseApplicationViewModel(applicationId, status);
+            await _httpService.Post<object>(url, model);
+            _snackbar.Add("Successfully Done", Severity.Success);
+            var application = ApplicationRequests.Find(x => x.Id == applicationId);
+            if(_authService.User.UserRole == UserRole.Student)
+            {
+                application.Status = ApplicationStatus.Created;
+            }
+            else
+            {
+                ApplicationRequests.Remove(application);
+            }
+        }
+        catch
+        {
+            _snackbar.Add("Something went wrong! Please try again.", Severity.Error);
+        }
+    }
 
 }

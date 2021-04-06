@@ -14,6 +14,9 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
 using System;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace StudentsApplicationProj.Server
 {
@@ -41,6 +44,26 @@ namespace StudentsApplicationProj.Server
             services.AddTransient<IInstructorService, InstructorService>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddDbContext<StudentDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StudentDbConnectionString")));
+
+            string secretKey = Configuration.GetValue<string>("SecretKey");
+            var byteKey = Encoding.ASCII.GetBytes(secretKey);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(byteKey),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
 
             // region Swagger
             services.AddSwaggerGen(c =>

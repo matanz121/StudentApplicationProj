@@ -45,15 +45,15 @@ namespace StudentsApplicationProj.Server.Controllers
             {
                 applications = _adminService.GetApplications();
             }
-            if (userInfo.UserRole == UserRole.DepartmentHead)
+            else if (userInfo.UserRole == UserRole.DepartmentHead)
             {
                 applications = _departmentHeadService.GetApplicationList(userInfo.UserId);
             }
-            if (userInfo.UserRole == UserRole.Instructor)
+            else if (userInfo.UserRole == UserRole.Instructor)
             {
                 applications = _instructorService.GetApplicationList(userInfo.UserId);
             }
-            if (userInfo.UserRole == UserRole.Student)
+            else if (userInfo.UserRole == UserRole.Student)
             {
                 applications = _studentService.GetApplicationList(userInfo.UserId);
             }

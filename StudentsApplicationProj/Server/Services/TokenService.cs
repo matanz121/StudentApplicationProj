@@ -26,13 +26,13 @@ namespace StudentsApplicationProj.Server.Services
         }
         public string GenerateToken(UserAccount user)
         {
-            string secretKey = _config.GetValue<string>("key:secretKey");
+            string secretKey = _config.GetValue<string>("SecretKey");
             var byteKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(byteKey, SecurityAlgorithms.HmacSha256);
             var claim = new[]
             {
                 new Claim("userid", user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.UserRole.ToString()),
+                new Claim("role", user.UserRole.ToString()),
                 new Claim(ClaimTypes.Name, Guid.NewGuid().ToString())
             };
             var jwtToken = new JwtSecurityToken(
@@ -55,7 +55,7 @@ namespace StudentsApplicationProj.Server.Services
                 var jwtToken = new JwtSecurityToken(accessToken);
                 var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type.Equals("userid", StringComparison.InvariantCultureIgnoreCase));
                 userInfo.UserId = Int32.Parse(userIdClaim.Value);
-                var userRoleClaim = jwtToken.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault().ToString();
+                var userRoleClaim = jwtToken.Claims.FirstOrDefault(x => x.Type.Equals("role", StringComparison.InvariantCultureIgnoreCase)).Value;
                 userInfo.UserRole = (UserRole)Enum.Parse(typeof(UserRole), userRoleClaim);
                 return userInfo;
 

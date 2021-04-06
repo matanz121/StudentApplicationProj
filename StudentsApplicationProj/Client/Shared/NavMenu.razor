@@ -12,7 +12,8 @@
         <MudNavLink Href="/requests" Icon="@Icons.Filled.Storage">Request Management</MudNavLink>
         if (_clientAuthService.User.UserRole == UserRole.Administrator)
         {
-            <MudNavLink Href="/reports" Icon="@Icons.Filled.FileDownload">Reports</MudNavLink>
+            <MudNavLink Href="/accounts" Icon="@Icons.Filled.People">Account Request</MudNavLink>
+            <MudNavLink Href="/add-course" Icon="@Icons.Filled.Book">Add Course</MudNavLink>
         }
     }
 </MudNavMenu>

@@ -22,7 +22,7 @@ namespace StudentsApplicationProj.Server.Services
 
         public bool AcceptOrDeclineApplication(int applicationId, ApplicationStatus status)
         {
-            if(status == ApplicationStatus.ApprovedByDeptHead && status == ApplicationStatus.DeclinedByDeptHead)
+            if(status == ApplicationStatus.ApprovedByAll || status == ApplicationStatus.Declined)
             {
                 var application = _context.CourseApplication
                 .Where(x => x.Id == applicationId)
@@ -59,6 +59,7 @@ namespace StudentsApplicationProj.Server.Services
                     .ThenInclude(x => x.UserAccount)
                     .Include(x => x.CourseApplication)
                     .ThenInclude(x => x.FileUrls)
+                    .Where(x => x.CourseApplication.Status == ApplicationStatus.ApprovedByInstructor)
                     .ToList();
             }
             return new List<StudentCourse>();
