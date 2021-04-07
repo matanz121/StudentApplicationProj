@@ -10,7 +10,8 @@ namespace StudentsApplicationProj.Server.Services
     {
         List<StudentCourse> GetApplications();
         List<Department> GetDepartments();
-        List<UserAccount> GetInstructors(int departmentId);
+        List<SystemUser> GetInstructors(int departmentId);
+        List<SystemUser> GetAccountsToApprove();
         bool AddCourse(Course course);
         bool ApproveAccount(int accountId);
         bool AssignCourse(int courseId, int accountId);
@@ -32,6 +33,7 @@ namespace StudentsApplicationProj.Server.Services
                 .ThenInclude(x => x.UserAccount)
                 .Include(x => x.CourseApplication)
                 .ThenInclude(x => x.FileUrls)
+                .Where(x => x.CourseApplication.Status != ApplicationStatus.ApprovedByAll)
                 .ToList();
         }
 
@@ -41,11 +43,21 @@ namespace StudentsApplicationProj.Server.Services
                 .ToList();
         }
 
-        public List<UserAccount> GetInstructors(int departmentId)
+        public List<SystemUser> GetInstructors(int departmentId)
         {
             return _context.SystemUser
+                .Include(x => x.UserAccount)
+                .Include(x => x.Department)
                 .Where(x => x.DepartmentId == departmentId && x.UserAccount.UserRole == UserRole.Instructor)
-                .Select(x => x.UserAccount)
+                .ToList();
+        }
+
+        public List<SystemUser> GetAccountsToApprove()
+        {
+            return _context.SystemUser
+                .Include(x => x.UserAccount)
+                .Include(x => x.Department)
+                .Where(x => x.UserAccount.AccountStatus == false)
                 .ToList();
         }
 
@@ -53,6 +65,7 @@ namespace StudentsApplicationProj.Server.Services
         {
             try
             {
+                course.DepartmentId = 1;
                 _context.Course.Add(course);
                 _context.SaveChanges();
                 return true;
@@ -81,7 +94,7 @@ namespace StudentsApplicationProj.Server.Services
                     var dept = _context.Department
                         .Where(x => x.Id == systemUser.DepartmentId)
                         .FirstOrDefault();
-                    dept.DepartmentHeadId = systemUser.Id;
+                    dept.DepartmentHeadId = accountId;
                 }
                 _context.SaveChanges();
                 return true;

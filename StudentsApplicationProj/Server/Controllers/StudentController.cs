@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Server.Services;
 using StudentsApplicationProj.Shared.Enum;
 using StudentsApplicationProj.Shared.Models;
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Controllers
 {
@@ -35,7 +33,7 @@ namespace StudentsApplicationProj.Server.Controllers
                 bool status = _studentService.AppealForDeclinedApplication(application.Id, userInfo.UserId);
                 if (status)
                 {
-                    return Ok();
+                    return Ok(application);
                 }
             }
             return BadRequest();
@@ -55,14 +53,16 @@ namespace StudentsApplicationProj.Server.Controllers
         }
 
         [HttpPost, Route("application")]
-        public async Task<IActionResult> AddApplication(ApplicationRequestFormModel application)
+        public IActionResult AddApplication(ApplicationRequestFormModel application)
         {
             var userInfo = _tokenService.GetUserInfoFromToken(Request);
-            if (userInfo.UserRole == UserRole.Student && userInfo.UserId > 0)
+            if (userInfo.UserRole == UserRole.Student && userInfo.UserId > 0 && application.CourseId > 0)
             {
-                foreach(var file in application.Files)
+                CourseApplication courseApplication = _mapper.Map<CourseApplication>(application);
+                bool status = _studentService.AddNewApplication(userInfo.UserId, application.CourseId, courseApplication);
+                if (status)
                 {
-                    Console.WriteLine(file.Name);
+                    return Ok(application);
                 }
             }
             return BadRequest();

@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StudentsApplicationProj.Server.Services;
-using StudentsApplicationProj.Shared.Enum;
 using StudentsApplicationProj.Shared.Models;
-using System.Collections.Generic;
 
 namespace StudentsApplicationProj.Server.Controllers
 {
@@ -25,7 +22,7 @@ namespace StudentsApplicationProj.Server.Controllers
             bool status = _instructorService.AcceptOrDeclineApplication(application.Id, application.Status);
             if (status)
             {
-                return Ok();
+                return Ok(application);
             }
             return BadRequest();
         }

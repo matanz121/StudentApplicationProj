@@ -1,0 +1,75 @@
+﻿@page "/add-course"
+
+@inject IHttpService _httpService
+@inject IClientAuthService _authService
+@inject NavigationManager _navigationManager
+@inject ISnackbar _snackbar
+
+<div style="width: 600px; margin: auto">
+    <h3>Add new Course</h3>
+    <EditForm Model="@CourseModel" OnValidSubmit="AddNewCourse">
+        <MudCard>
+            <DataAnnotationsValidator />
+            <MudCardContent>
+                <MudSelect Label="Select Instructor" @bind-Value="CourseModel.CourseInstructor.Id">
+                    @foreach (var instructor in Instructors)
+                    {
+                        <MudSelectItem Value="@instructor.Id">@instructor.FirstName @instructor.LastName</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudTextField Label="Course Name" @bind-Value="CourseModel.CourseName" For="@(() => CourseModel.CourseName)" />
+                <MudTextField Label="Course Grade" @bind-Value="CourseModel.Grade" For="@(() => CourseModel.Grade)" />
+            </MudCardContent>
+            <br />
+            <MudCardActions>
+                <MudButton FullWidth="true" ButtonType="MudBlazor.ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="IsLoading">Add</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</div>
+
+@code {
+    private CourseModel CourseModel { get; set; } = new CourseModel()
+    {
+        CourseInstructor = new()
+    };
+    private IList<UserAccountModel> Instructors = new List<UserAccountModel>();
+    public bool IsLoading { get; set; }
+    private int departmentId = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_authService.User != null && _authService.User.UserRole == UserRole.Administrator)
+        {
+            try
+            {
+                Instructors = await _httpService.Get<List<UserAccountModel>>($"/api/admin/instructors/{departmentId}");
+            }
+            catch
+            {
+                Instructors = new List<UserAccountModel>();
+            }
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task AddNewCourse()
+    {
+        try
+        {
+            await _httpService.Post<CourseModel>("/api/admin/course", CourseModel);
+            _snackbar.Add("Successfully Added!", Severity.Success);
+            CourseModel = new CourseModel()
+            {
+                CourseInstructor = new()
+            };
+        }
+        catch
+        {
+            _snackbar.Add("Something went wrong, please try again", Severity.Error);
+        }
+    }
+}

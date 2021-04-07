@@ -1,0 +1,73 @@
+﻿@page "/accounts"
+
+@inject IHttpService _httpService
+@inject IClientAuthService _authService
+@inject NavigationManager _navigationManager
+@inject ISnackbar _snackbar
+
+<MudTable Items="@Elements" Bordered="true" Striped="true">
+    <HeaderContent>
+        <MudTh>First Name</MudTh>
+        <MudTh>Last Name</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Department</MudTh>
+        <MudTh>Signup As</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.FirstName</MudTd>
+        <MudTd>@context.LastName</MudTd>
+        <MudTd>@context.Email</MudTd>
+        <MudTd>@context.Department.DepartmentName</MudTd>
+        <MudTd>@context.UserRole.ToString()</MudTd>
+        <MudTd>
+            <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Secondary" OnClick="@(() => Approve(context.Id))">Approve</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+@code {
+
+    private IList<UserAccountModel> Elements = new List<UserAccountModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_authService.User != null)
+        {
+            try
+            {
+                Elements = await _httpService.Get<List<UserAccountModel>>("/api/admin/accountsToApprove");
+            }
+            catch
+            {
+                Elements = new List<UserAccountModel>();
+            }
+        }
+        else
+        {
+            _navigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task Approve(int Id)
+    {
+        UserModel userModel = new UserModel
+        {
+            Id = Id
+        };
+        try
+        {
+            await _httpService.Put<UserModel>("/api/admin/accounts", userModel);
+            var element = Elements.Where(x => x.Id == Id).FirstOrDefault();
+            Elements.Remove(element);
+            _snackbar.Add("Successfully Approved", Severity.Success);
+        }
+        catch
+        {
+            _snackbar.Add("Something went wrong, please try again", Severity.Error);
+        }
+    }
+
+}

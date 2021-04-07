@@ -53,7 +53,7 @@ namespace StudentsApplicationProj.Server.Services
                 _context.SaveChanges();
                 if(application != null)
                 {
-                    application.Status = ApplicationStatus.AppealedByStudent;
+                    application.Status = ApplicationStatus.Created;
                     _context.SaveChanges();
                     return true;
                 }
