@@ -27,7 +27,8 @@ namespace StudentsApplicationProj.Server.Controllers
                 return Ok(new UserToken
                 {
                     Token = _tokenService.GenerateToken(result),
-                    Name = result.FirstName
+                    Name = result.FirstName,
+                    UserRole = result.UserRole
                 });
             }
             return BadRequest();
@@ -39,11 +40,7 @@ namespace StudentsApplicationProj.Server.Controllers
             var result = await _authService.Register(model);
             if (result != null)
             {
-                return Ok(new UserToken
-                {
-                    Token = _tokenService.GenerateToken(result),
-                    Name = result.FirstName
-                });
+                return Ok(new { });
             }
             return BadRequest();
         }

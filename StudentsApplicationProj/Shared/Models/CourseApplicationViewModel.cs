@@ -2,17 +2,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace StudentsApplicationProj.Server.Models
+namespace StudentsApplicationProj.Shared.Models
 {
-    public class CourseApplication
+    public class CourseApplicationViewModel
     {
         public int Id { get; set; }
+        public UserModel Student { get; set; }
+        public CourseModel Course { get; set; }
         public string ApplicationName { get; set; }
         public string ApplicationBody { get; set; }
         public ApplicationStatus Status { get; set; }
-        public DateTime ApplicationDateTime { get; set; }
-        public IList<FileUrl> FileUrls { get; set; }
-        public StudentCourse StudentCourse { get; set; }
-        public int StudentCourseId { get; set; }
+        public DateTime? ApplicationDateTime { get; set; }
+        public IList<FileUrlModel> FileUrls { get; set; }
     }
 }

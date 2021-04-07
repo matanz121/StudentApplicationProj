@@ -1,10 +1,20 @@
-﻿<MudNavMenu Class="mud-width-full">
+﻿@inject IClientAuthService _clientAuthService
+
+<MudNavMenu Class="mud-width-full">
     <MudText Typo="Typo.h6" Class="px-4">Main Menu</MudText>
     <MudDivider Class="my-2" />
-    <MudNavLink Href="/dashboard" Icon="@Icons.Filled.Dashboard">Create a new request</MudNavLink>
-    <MudNavLink Href="/servers" Icon="@Icons.Filled.Storage">Request Management</MudNavLink>
-    <MudNavLink Href="/user" Icon="@Icons.Filled.People">User Managment</MudNavLink>
-    <MudNavLink Href="/security" Icon="@Icons.Filled.Security" Disabled="true">Reports</MudNavLink>
+    @if (_clientAuthService.User != null)
+    {
+        if (_clientAuthService.User.UserRole == UserRole.Student)
+        {
+            <MudNavLink Href="/add-request" Icon="@Icons.Filled.Dashboard">Create a new request</MudNavLink>
+        }
+        <MudNavLink Href="/requests" Icon="@Icons.Filled.Storage">Request Management</MudNavLink>
+        if (_clientAuthService.User.UserRole == UserRole.Administrator)
+        {
+            <MudNavLink Href="/reports" Icon="@Icons.Filled.FileDownload">Reports</MudNavLink>
+        }
+    }
 </MudNavMenu>
 
 

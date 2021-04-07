@@ -30,15 +30,19 @@ namespace StudentsApplicationProj.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddAutoMapper(typeof(Startup));
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddMudServices();
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IStudentService, StudentService>();
+            services.AddTransient<IDepartmentHeadService, DepartmentHeadService>();
+            services.AddTransient<IInstructorService, InstructorService>();
+            services.AddTransient<IAdminService, AdminService>();
             services.AddDbContext<StudentDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StudentDbConnectionString")));
 
-            #region Swagger
+            // region Swagger
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -53,7 +57,7 @@ namespace StudentsApplicationProj.Server
                 //... and tell Swagger to use those XML comments.
                 c.IncludeXmlComments(xmlPath);
             });
-            #endregion
+            // endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,13 +83,13 @@ namespace StudentsApplicationProj.Server
             app.UseAuthentication();
             app.UseAuthorization();
 
-            #region Swagger
+            // region Swagger
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "StudentsApplicationProj XML API");
             });
-            #endregion
+            // endregion
 
             app.UseEndpoints(endpoints =>
             {

@@ -50,8 +50,7 @@ namespace StudentsApplicationProj.Client.Services
 
         public async Task Register(RegisterRequest registerModel)
         {
-            User = await _httpService.Post<UserToken>("/api/auth/register", registerModel);
-            await _localStorage.SetItemAsync("user", User);
+            await _httpService.Post<object>("/api/auth/register", registerModel);
         }
 
         public async Task Logout()

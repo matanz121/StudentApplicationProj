@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using StudentsApplicationProj.Server.Models;
+using StudentsApplicationProj.Shared.Enum;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Services
 {
     public interface ITokenService
     {
         string GenerateToken(UserAccount user);
+        UserInfoFromToken GetUserInfoFromToken(HttpRequest Request);
     }
 
     public class TokenService: ITokenService
@@ -32,7 +32,7 @@ namespace StudentsApplicationProj.Server.Services
             var claim = new[]
             {
                 new Claim("userid", user.Id.ToString()),
-                new Claim("role", user.UserRole.ToString()),
+                new Claim(ClaimTypes.Role, user.UserRole.ToString()),
                 new Claim(ClaimTypes.Name, Guid.NewGuid().ToString())
             };
             var jwtToken = new JwtSecurityToken(
@@ -43,5 +43,33 @@ namespace StudentsApplicationProj.Server.Services
             string token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             return token;
         }
+
+        public UserInfoFromToken GetUserInfoFromToken(HttpRequest Request)
+        {
+            var userInfo = new UserInfoFromToken();
+            try
+            {
+                string header = Request.Headers["Authorization"];
+                string[] tokenArray = header.Split(' ');
+                string accessToken = tokenArray[1];
+                var jwtToken = new JwtSecurityToken(accessToken);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type.Equals("userid", StringComparison.InvariantCultureIgnoreCase));
+                userInfo.UserId = Int32.Parse(userIdClaim.Value);
+                var userRoleClaim = jwtToken.Claims.Where(x => x.Type == ClaimTypes.Role).FirstOrDefault().ToString();
+                userInfo.UserRole = (UserRole)Enum.Parse(typeof(UserRole), userRoleClaim);
+                return userInfo;
+
+            }
+            catch
+            {
+                return userInfo;
+            }
+        }
+    }
+
+    public class UserInfoFromToken
+    {
+        public int UserId { get; set; }
+        public UserRole UserRole { get; set; }
     }
 }

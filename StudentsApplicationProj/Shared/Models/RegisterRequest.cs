@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StudentsApplicationProj.Shared.Enum;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace StudentsApplicationProj.Shared.Models
@@ -22,5 +23,6 @@ namespace StudentsApplicationProj.Shared.Models
         [Required]
         [Compare(nameof(Password))]
         public string ConfirmPassword { get; set; }
+        public UserRole UserRole { get; set; }
     }
 }
