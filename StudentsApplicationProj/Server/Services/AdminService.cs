@@ -65,6 +65,8 @@ namespace StudentsApplicationProj.Server.Services
         {
             try
             {
+                int instructorId = _context.SystemUser.Where(x => x.UserAccount.Id == course.CourseInstructorId).Select(x => x.Id).FirstOrDefault();
+                course.CourseInstructorId = instructorId;
                 course.DepartmentId = 1;
                 _context.Course.Add(course);
                 _context.SaveChanges();
