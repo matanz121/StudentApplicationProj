@@ -13,7 +13,7 @@ namespace StudentsApplicationProj.Server.Services
 {
     public interface ITokenService
     {
-        string GenerateToken(UserAccount user);
+        string GenerateToken(SystemUser user);
         UserInfoFromToken GetUserInfoFromToken(HttpRequest Request);
     }
 
@@ -24,7 +24,7 @@ namespace StudentsApplicationProj.Server.Services
         {
             _config = config;
         }
-        public string GenerateToken(UserAccount user)
+        public string GenerateToken(SystemUser user)
         {
             string secretKey = _config.GetValue<string>("SecretKey");
             var byteKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

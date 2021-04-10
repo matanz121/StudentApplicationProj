@@ -21,7 +21,8 @@
         <MudTd>@context.Department.DepartmentName</MudTd>
         <MudTd>@context.UserRole.ToString()</MudTd>
         <MudTd>
-            <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Secondary" OnClick="@(() => Approve(context.Id))">Approve</MudButton>
+            <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" OnClick="@(() => ApproveOrDelete(context.Id, true))">Approve</MudButton>
+            <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Secondary" OnClick="@(() => ApproveOrDelete(context.Id, false))">Delete</MudButton>
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -51,7 +52,7 @@
         }
     }
 
-    private async Task Approve(int Id)
+    private async Task ApproveOrDelete(int Id, bool status)
     {
         UserModel userModel = new UserModel
         {
@@ -59,7 +60,7 @@
         };
         try
         {
-            await _httpService.Put<UserModel>("/api/admin/accounts", userModel);
+            await _httpService.Put<UserModel>($"/api/admin/accounts/{status}", userModel);
             var element = Elements.Where(x => x.Id == Id).FirstOrDefault();
             Elements.Remove(element);
             _snackbar.Add("Successfully Approved", Severity.Success);

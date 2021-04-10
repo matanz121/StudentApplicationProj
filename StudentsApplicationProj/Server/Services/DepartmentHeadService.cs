@@ -52,15 +52,23 @@ namespace StudentsApplicationProj.Server.Services
                 .FirstOrDefault();
             if(departmentId > 0)
             {
-                return _context.StudentCourse
+                var courseAsDepartmentHead =  _context.StudentCourse
                     .Where(x => x.Course.DepartmentId == departmentId)
                     .Include(x => x.Course)
                     .Include(x => x.Student)
-                    .ThenInclude(x => x.UserAccount)
                     .Include(x => x.CourseApplication)
                     .ThenInclude(x => x.FileUrls)
                     .Where(x => x.CourseApplication.Status == ApplicationStatus.ApprovedByInstructor)
                     .ToList();
+                var courseAsInstructor = _context.StudentCourse
+                    .Where(x => x.Course.CourseInstructorId == departmentHeadId)
+                    .Include(x => x.Course)
+                    .Include(x => x.Student)
+                    .Include(x => x.CourseApplication)
+                    .ThenInclude(x => x.FileUrls)
+                    .Where(x => x.CourseApplication.Status == ApplicationStatus.Created)
+                    .ToList();
+                return courseAsDepartmentHead.Union(courseAsInstructor).ToList();
             }
             return new List<StudentCourse>();
         }

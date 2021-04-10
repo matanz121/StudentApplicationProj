@@ -38,7 +38,7 @@ namespace StudentsApplicationProj.Server.Controllers
         public async Task<IActionResult> Register(RegisterRequest model)
         {
             var result = await _authService.Register(model);
-            if (result != null)
+            if (result)
             {
                 return Ok(new { });
             }

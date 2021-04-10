@@ -22,16 +22,16 @@ namespace StudentsApplicationProj.Server.Controllers.Users
 
         // GET: api/User
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserAccount>>> GetUserAccount()
+        public async Task<ActionResult<IEnumerable<SystemUser>>> GetUserAccount()
         {
-            return await _context.UserAccount.ToListAsync();
+            return await _context.SystemUser.ToListAsync();
         }
 
         // GET: api/User/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserAccount>> GetUserAccount(int id)
+        public async Task<ActionResult<SystemUser>> GetUserAccount(int id)
         {
-            var userAccount = await _context.UserAccount.FindAsync(id);
+            var userAccount = await _context.SystemUser.FindAsync(id);
 
             if (userAccount == null)
             {
@@ -44,7 +44,7 @@ namespace StudentsApplicationProj.Server.Controllers.Users
         // PUT: api/User/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUserAccount(int id, UserAccount userAccount)
+        public async Task<IActionResult> PutUserAccount(int id, SystemUser userAccount)
         {
             if (id != userAccount.Id)
             {
@@ -75,9 +75,9 @@ namespace StudentsApplicationProj.Server.Controllers.Users
         // POST: api/User
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<UserAccount>> PostUserAccount(UserAccount userAccount)
+        public async Task<ActionResult<SystemUser>> PostUserAccount(SystemUser userAccount)
         {
-            _context.UserAccount.Add(userAccount);
+            _context.SystemUser.Add(userAccount);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetUserAccount", new { id = userAccount.Id }, userAccount);
@@ -87,13 +87,13 @@ namespace StudentsApplicationProj.Server.Controllers.Users
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserAccount(int id)
         {
-            var userAccount = await _context.UserAccount.FindAsync(id);
+            var userAccount = await _context.SystemUser.FindAsync(id);
             if (userAccount == null)
             {
                 return NotFound();
             }
 
-            _context.UserAccount.Remove(userAccount);
+            _context.SystemUser.Remove(userAccount);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -101,7 +101,7 @@ namespace StudentsApplicationProj.Server.Controllers.Users
 
         private bool UserAccountExists(int id)
         {
-            return _context.UserAccount.Any(e => e.Id == id);
+            return _context.SystemUser.Any(e => e.Id == id);
         }
     }
 }

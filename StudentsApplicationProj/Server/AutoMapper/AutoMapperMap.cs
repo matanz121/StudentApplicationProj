@@ -12,15 +12,9 @@ namespace StudentsApplicationProj.Server.AutoMapper
             CreateMap<Course, CourseModel>();
 
             CreateMap<SystemUser, UserModel>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserAccount.FirstName));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FirstName));
 
-            CreateMap<SystemUser, UserAccountModel>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserAccount.Id))
-                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.UserAccount.FirstName))
-                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.UserAccount.LastName))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.UserAccount.Email))
-                .ForMember(dest => dest.AccountStatus, opt => opt.MapFrom(src => src.UserAccount.AccountStatus))
-                .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.UserAccount.UserRole));
+            CreateMap<SystemUser, UserAccountModel>();
 
             CreateMap<Department, DepartmentModel>();
 

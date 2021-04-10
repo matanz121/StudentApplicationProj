@@ -13,7 +13,7 @@ namespace StudentsApplicationProj.Server.Services
         List<SystemUser> GetInstructors(int departmentId);
         List<SystemUser> GetAccountsToApprove();
         bool AddCourse(Course course);
-        bool ApproveAccount(int accountId);
+        bool ApproveOrDeleteAccount(int accountId, bool approveOrDelete);
         bool AssignCourse(int courseId, int accountId);
     }
 
@@ -30,7 +30,6 @@ namespace StudentsApplicationProj.Server.Services
             return _context.StudentCourse
                 .Include(x => x.Course)
                 .Include(x => x.Student)
-                .ThenInclude(x => x.UserAccount)
                 .Include(x => x.CourseApplication)
                 .ThenInclude(x => x.FileUrls)
                 .Where(x => x.CourseApplication.Status != ApplicationStatus.ApprovedByAll)
@@ -46,18 +45,16 @@ namespace StudentsApplicationProj.Server.Services
         public List<SystemUser> GetInstructors(int departmentId)
         {
             return _context.SystemUser
-                .Include(x => x.UserAccount)
                 .Include(x => x.Department)
-                .Where(x => x.DepartmentId == departmentId && x.UserAccount.UserRole == UserRole.Instructor)
+                .Where(x => x.DepartmentId == departmentId && (x.UserRole == UserRole.Instructor || x.UserRole == UserRole.DepartmentHead))
                 .ToList();
         }
 
         public List<SystemUser> GetAccountsToApprove()
         {
             return _context.SystemUser
-                .Include(x => x.UserAccount)
                 .Include(x => x.Department)
-                .Where(x => x.UserAccount.AccountStatus == false)
+                .Where(x => x.AccountStatus == false)
                 .ToList();
         }
 
@@ -65,8 +62,6 @@ namespace StudentsApplicationProj.Server.Services
         {
             try
             {
-                int instructorId = _context.SystemUser.Where(x => x.UserAccount.Id == course.CourseInstructorId).Select(x => x.Id).FirstOrDefault();
-                course.CourseInstructorId = instructorId;
                 course.DepartmentId = 1;
                 _context.Course.Add(course);
                 _context.SaveChanges();
@@ -78,25 +73,31 @@ namespace StudentsApplicationProj.Server.Services
             }
         }
 
-        public bool ApproveAccount(int accountId)
+        public bool ApproveOrDeleteAccount(int accountId, bool approveOrDelete)
         {
             var systemUser = _context.SystemUser
-                .Where(x => x.UserAccountId == accountId)
-                .Include(x => x.UserAccount)
+                .Where(x => x.Id == accountId)
                 .FirstOrDefault();
-            if(systemUser == null || systemUser.UserAccount == null)
+            if(systemUser == null)
             {
                 return false;
             }
             try
             {
-                systemUser.UserAccount.AccountStatus = true;
-                if(systemUser.UserAccount.UserRole == UserRole.DepartmentHead)
+                if (approveOrDelete)
                 {
-                    var dept = _context.Department
-                        .Where(x => x.Id == systemUser.DepartmentId)
-                        .FirstOrDefault();
-                    dept.DepartmentHeadId = accountId;
+                    systemUser.AccountStatus = true;
+                    if (systemUser.UserRole == UserRole.DepartmentHead)
+                    {
+                        var dept = _context.Department
+                            .Where(x => x.Id == systemUser.DepartmentId)
+                            .FirstOrDefault();
+                        dept.DepartmentHeadId = accountId;
+                    }
+                }
+                else
+                {
+                    _context.SystemUser.Remove(systemUser);
                 }
                 _context.SaveChanges();
                 return true;

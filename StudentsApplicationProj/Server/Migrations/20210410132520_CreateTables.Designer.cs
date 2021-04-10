@@ -10,8 +10,8 @@ using StudentsApplicationProj.Server.Models;
 namespace StudentsApplicationProj.Server.Migrations
 {
     [DbContext(typeof(StudentDbContext))]
-    [Migration("20210321103339_SeedDataForAdminLogin")]
-    partial class SeedDataForAdminLogin
+    [Migration("20210410132520_CreateTables")]
+    partial class CreateTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -183,32 +183,13 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserAccountId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("UserAccountId");
-
-                    b.ToTable("SystemUser");
-                });
-
-            modelBuilder.Entity("StudentsApplicationProj.Server.Models.UserAccount", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
                     b.Property<bool>("AccountStatus")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -231,16 +212,19 @@ namespace StudentsApplicationProj.Server.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("UserAccount");
+                    b.ToTable("SystemUser");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             AccountStatus = true,
+                            DepartmentId = 1,
                             Email = "admin@gmail.com",
                             FirstName = "Admin First",
                             LastName = "Admin Last",
@@ -333,15 +317,7 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasForeignKey("DepartmentId")
                         .IsRequired();
 
-                    b.HasOne("StudentsApplicationProj.Server.Models.UserAccount", "UserAccount")
-                        .WithMany()
-                        .HasForeignKey("UserAccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Department");
-
-                    b.Navigation("UserAccount");
                 });
 
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.Course", b =>

@@ -16,7 +16,6 @@ namespace StudentsApplicationProj.Server.Models
             builder.ApplyConfiguration(new InstructorCourseMap());
             builder.ApplyConfiguration(new StudentCourseMap());
             builder.ApplyConfiguration(new SystemUserMap());
-            builder.ApplyConfiguration(new UserAccountMap());
             builder.ApplyConfiguration(new CourseApplicationMap());
             builder.ApplyConfiguration(new FileUrlMap());
         }
@@ -26,7 +25,6 @@ namespace StudentsApplicationProj.Server.Models
         public DbSet<InstructorCourse> InstructorCourse { get; set; }
         public DbSet<StudentCourse> StudentCourse { get; set; }
         public DbSet<SystemUser> SystemUser { get; set; }
-        public DbSet<UserAccount> UserAccount { get; set; }
         public DbSet<CourseApplication> CourseApplication { get; set; }
         public DbSet<FileUrl> FileUrl { get; set; }
     }
