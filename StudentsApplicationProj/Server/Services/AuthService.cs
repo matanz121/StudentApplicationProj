@@ -1,4 +1,5 @@
-﻿using StudentsApplicationProj.Server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Shared.Models;
 using System;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace StudentsApplicationProj.Server.Services
 {
     public interface IAuthService
     {
-        UserAccount Login(LoginRequest loginModel);
-        Task<UserAccount> Register(RegisterRequest registerModel);
+        SystemUser Login(LoginRequest loginModel);
+        Task<bool> Register(RegisterRequest registerModel);
     }
 
     public class AuthService : IAuthService
@@ -21,38 +22,35 @@ namespace StudentsApplicationProj.Server.Services
             _context = context;
         }
 
-        public UserAccount Login(LoginRequest loginModel)
+        public SystemUser Login(LoginRequest loginModel)
         {
             var hashedPassword = HashPassword(loginModel.Password);
-            return _context.UserAccount
+            return _context.SystemUser
                 .Where(x => x.Email == loginModel.Email && x.Password == hashedPassword && x.AccountStatus == true)
                 .FirstOrDefault();
         }
 
-        public async Task<UserAccount> Register(RegisterRequest registerModel)
+        public async Task<bool> Register(RegisterRequest registerModel)
         {
             var user = new SystemUser
             {
                 DepartmentId = 1,
-                UserAccount = new UserAccount
-                {
-                    Email = registerModel.Email,
-                    Password = HashPassword(registerModel.Password),
-                    FirstName = registerModel.FirstName,
-                    LastName = registerModel.LastName,
-                    UserRole = registerModel.UserRole,
-                    AccountStatus = false
-                }
+                Email = registerModel.Email,
+                Password = HashPassword(registerModel.Password),
+                FirstName = registerModel.FirstName,
+                LastName = registerModel.LastName,
+                UserRole = registerModel.UserRole,
+                AccountStatus = false
             };
             try
             {
                 _context.SystemUser.Add(user);
                 await _context.SaveChangesAsync();
-                return user.UserAccount;
+                return true;
             }
             catch
             {
-                return null;
+                return false;
             }
         }
 

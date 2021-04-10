@@ -48,10 +48,10 @@ namespace StudentsApplicationProj.Server.Controllers
             return BadRequest();
         }
 
-        [HttpPut, Route("accounts")]
-        public IActionResult ApproveAccount(UserModel user)
+        [HttpPut, Route("accounts/{approveOrDelete}")]
+        public IActionResult ApproveAccount(UserModel user, bool approveOrDelete)
         {
-            var status = _adminService.ApproveAccount(user.Id);
+            var status = _adminService.ApproveOrDeleteAccount(user.Id, approveOrDelete);
             if (status)
             {
                 return Ok(user);

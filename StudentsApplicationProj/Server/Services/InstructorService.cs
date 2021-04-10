@@ -50,7 +50,6 @@ namespace StudentsApplicationProj.Server.Services
                 .Where(x => x.Course.CourseInstructorId == instructorId)
                 .Include(x => x.Course)
                 .Include(x => x.Student)
-                .ThenInclude(x => x.UserAccount)
                 .Include(x => x.CourseApplication)
                 .ThenInclude(x => x.FileUrls)
                 .Where(x => x.CourseApplication.Status == ApplicationStatus.Created)

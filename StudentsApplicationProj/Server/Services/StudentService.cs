@@ -71,7 +71,6 @@ namespace StudentsApplicationProj.Server.Services
                 .Where(x => x.StudentId == studentId)
                 .Include(x => x.Course)
                 .Include(x => x.Student)
-                .ThenInclude(x => x.UserAccount)
                 .Include(x => x.CourseApplication)
                 .ThenInclude(x => x.FileUrls)
                 .ToList();
@@ -80,7 +79,7 @@ namespace StudentsApplicationProj.Server.Services
         public List<Course> GetCourses(int studentId)
         {
             int departmentId = _context.SystemUser
-                .Where(x => x.UserAccountId == studentId)
+                .Where(x => x.Id == studentId)
                 .Select(x => x.DepartmentId)
                 .FirstOrDefault();
             if(departmentId > 0)
