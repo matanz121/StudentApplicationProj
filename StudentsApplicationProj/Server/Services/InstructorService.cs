@@ -3,36 +3,55 @@ using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Shared.Enum;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Services
 {
     public interface IInstructorService
     {
         List<StudentCourse> GetApplicationList(int instructorId);
-        bool AcceptOrDeclineApplication(int applicationId, ApplicationStatus status);
+        Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status);
     }
 
     public class InstructorService : IInstructorService
     {
         private readonly StudentDbContext _context;
-        public InstructorService(StudentDbContext context)
+        private readonly IEmailSenderService _emailSenderService;
+        public InstructorService(StudentDbContext context, IEmailSenderService emailSenderService)
         {
             _context = context;
+            _emailSenderService = emailSenderService;
         }
 
-        public bool AcceptOrDeclineApplication(int applicationId, ApplicationStatus status)
+        public async Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status)
         {
             if (status == ApplicationStatus.ApprovedByInstructor || status == ApplicationStatus.Declined)
             {
                 var application = _context.CourseApplication
                 .Where(x => x.Id == applicationId)
+                .Include(x => x.StudentCourse)
+                .ThenInclude(x => x.Student)
+                .Include(x => x.StudentCourse)
+                .ThenInclude(x => x.Course)
                 .FirstOrDefault();
                 if (application != null)
                 {
                     try
                     {
                         application.Status = status;
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
+                        if(application.StudentCourse.Course != null && application.StudentCourse.Student != null)
+                        {
+                            string emailStatus = status == ApplicationStatus.Declined ? "declined by instructor" : "approved by instructor";
+                            var emailModel = new SendGridModel
+                            {
+                                Subject = status != ApplicationStatus.Declined ? "Request Accepted by Instructor" : " Request declined by Instructor",
+                                To = application.StudentCourse.Student.Email,
+                                PlainText = "",
+                                HtmlContent = $"<p> Your application for course {application.StudentCourse.Course.CourseName} has been {emailStatus}</p>"
+                            };
+                            await _emailSenderService.SendEmail(emailModel);
+                        }
                         return true;
                     }
                     catch

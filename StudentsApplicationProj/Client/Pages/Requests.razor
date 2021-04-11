@@ -6,15 +6,25 @@
 
 <MudTable Items="@ApplicationRequests" Bordered="true" Striped="true">
     <HeaderContent>
-        <MudTh>Student Name</MudTh>
+        @if (_authService.User != null && _authService.User.UserRole != UserRole.Student)
+        {
+            <MudTh>Student Name</MudTh>
+        }
         <MudTh>Course Name</MudTh>
         <MudTh>Application Name</MudTh>
         <MudTh>Application Body</MudTh>
         <MudTh>Date</MudTh>
+        @if (_authService.User != null && _authService.User.UserRole == UserRole.Student)
+        {
+            <MudTh>Status</MudTh>
+        }
         <MudTh>Action</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>@context.Student.Name</MudTd>
+        @if (_authService.User != null && _authService.User.UserRole != UserRole.Student)
+        {
+            <MudTd>@context.Student.Name</MudTd>
+        }
         <MudTd>@context.Course.CourseName</MudTd>
         <MudTd>@context.ApplicationName</MudTd>
         <MudTd>@context.ApplicationBody</MudTd>
@@ -25,12 +35,19 @@
                 <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" OnClick="@(() => AcceptAppealOrDecline(context.Id, true))">Accept</MudButton>
                 <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Secondary" OnClick="@(() => AcceptAppealOrDecline(context.Id, false))">Declined</MudButton>
             </MudTd>
+
         }
-        else if (context.Status == ApplicationStatus.Declined)
+        else if (_authService.User.UserRole == UserRole.Student)
         {
-            <MudTd>
-                <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" OnClick="@(() => AcceptAppealOrDecline(context.Id, true))">Appeal</MudButton>
-            </MudTd>
+            <MudTh>
+                <MudTh>@context.Status.ToString()</MudTh>
+            </MudTh>
+            @if (context.Status == ApplicationStatus.Declined)
+            {
+                <MudTd>
+                    <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" OnClick="@(() => AcceptAppealOrDecline(context.Id, true))">Appeal</MudButton>
+                </MudTd>
+            }
         }
     </RowTemplate>
     <PagerContent>

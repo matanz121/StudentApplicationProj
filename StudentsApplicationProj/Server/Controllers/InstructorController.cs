@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentsApplicationProj.Server.Services;
 using StudentsApplicationProj.Shared.Models;
+using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Controllers
 {
@@ -17,9 +18,9 @@ namespace StudentsApplicationProj.Server.Controllers
         }
 
         [HttpPost, Route("acceptOrDecline")]
-        public IActionResult AcceptOrDeclineApplication(CourseApplicationViewModel application)
+        public async Task<IActionResult> AcceptOrDeclineApplication(CourseApplicationViewModel application)
         {
-            bool status = _instructorService.AcceptOrDeclineApplication(application.Id, application.Status);
+            bool status = await _instructorService.AcceptOrDeclineApplication(application.Id, application.Status);
             if (status)
             {
                 return Ok(application);

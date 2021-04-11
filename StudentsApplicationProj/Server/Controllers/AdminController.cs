@@ -5,6 +5,7 @@ using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Server.Services;
 using StudentsApplicationProj.Shared.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Controllers
 {
@@ -37,10 +38,10 @@ namespace StudentsApplicationProj.Server.Controllers
             );
 
         [HttpPost, Route("course")]
-        public IActionResult AddCourse(CourseModel courseModel)
+        public async Task<IActionResult> AddCourse(CourseModel courseModel)
         {
             var course = _mapper.Map<Course>(courseModel);
-            var status = _adminService.AddCourse(course);
+            var status = await _adminService.AddCourse(course);
             if (status)
             {
                 return Ok(courseModel);
@@ -49,9 +50,9 @@ namespace StudentsApplicationProj.Server.Controllers
         }
 
         [HttpPut, Route("accounts/{approveOrDelete}")]
-        public IActionResult ApproveAccount(UserModel user, bool approveOrDelete)
+        public async Task<IActionResult> ApproveAccount(UserModel user, bool approveOrDelete)
         {
-            var status = _adminService.ApproveOrDeleteAccount(user.Id, approveOrDelete);
+            var status = await _adminService.ApproveOrDeleteAccount(user.Id, approveOrDelete);
             if (status)
             {
                 return Ok(user);
