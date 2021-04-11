@@ -6,6 +6,7 @@ using StudentsApplicationProj.Server.Services;
 using StudentsApplicationProj.Shared.Enum;
 using StudentsApplicationProj.Shared.Models;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Controllers
 {
@@ -25,12 +26,12 @@ namespace StudentsApplicationProj.Server.Controllers
         }
 
         [HttpPost, Route("appeal")]
-        public IActionResult AppealApplication(CourseApplicationViewModel application)
+        public async Task<IActionResult> AppealApplication(CourseApplicationViewModel application)
         {
             var userInfo = _tokenService.GetUserInfoFromToken(Request);
             if (userInfo.UserRole == UserRole.Student && userInfo.UserId > 0)
             {
-                bool status = _studentService.AppealForDeclinedApplication(application.Id, userInfo.UserId);
+                bool status = await _studentService.AppealForDeclinedApplication(application.Id, userInfo.UserId);
                 if (status)
                 {
                     return Ok(application);
@@ -53,13 +54,13 @@ namespace StudentsApplicationProj.Server.Controllers
         }
 
         [HttpPost, Route("application")]
-        public IActionResult AddApplication(ApplicationRequestFormModel application)
+        public async Task<IActionResult> AddApplication(ApplicationRequestFormModel application)
         {
             var userInfo = _tokenService.GetUserInfoFromToken(Request);
             if (userInfo.UserRole == UserRole.Student && userInfo.UserId > 0 && application.CourseId > 0)
             {
                 CourseApplication courseApplication = _mapper.Map<CourseApplication>(application);
-                bool status = _studentService.AddNewApplication(userInfo.UserId, application.CourseId, courseApplication);
+                bool status = await _studentService.AddNewApplication(userInfo.UserId, application.CourseId, courseApplication);
                 if (status)
                 {
                     return Ok(application);

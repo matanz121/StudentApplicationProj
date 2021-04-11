@@ -4,26 +4,30 @@ using StudentsApplicationProj.Shared.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Services
 {
     public interface IStudentService
     {
         List<StudentCourse> GetApplicationList(int studentId);
-        bool AddNewApplication(int studentId, int courseId, CourseApplication studentCourse);
-        bool AppealForDeclinedApplication(int applicationId, int studentId);
+        Task<bool> AddNewApplication(int studentId, int courseId, CourseApplication studentCourse);
+        Task<bool> AppealForDeclinedApplication(int applicationId, int studentId);
         List<Course> GetCourses(int studentId);
     }
 
     public class StudentService : IStudentService
     {
         private readonly StudentDbContext _context;
-        public StudentService(StudentDbContext context)
+        private readonly IEmailSenderService _emailSenderService;
+
+        public StudentService(StudentDbContext context, IEmailSenderService emailSenderService)
         {
             _context = context;
+            _emailSenderService = emailSenderService;
         }
 
-        public bool AddNewApplication(int studentId, int courseId, CourseApplication courseApplication)
+        public async Task<bool> AddNewApplication(int studentId, int courseId, CourseApplication courseApplication)
         {
             try
             {
@@ -34,7 +38,25 @@ namespace StudentsApplicationProj.Server.Services
                     StudentId = studentId,
                     CourseApplication = courseApplication
                 });
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+                var course = _context.Course
+                    .Where(x => x.Id == courseId)
+                    .Include(x => x.CourseInstructor)
+                    .FirstOrDefault();
+                var student = _context.SystemUser
+                    .Where(x => x.Id == studentId)
+                    .FirstOrDefault();
+                if(course != null && student != null)
+                {
+                    var emailModel = new SendGridModel
+                    {
+                        Subject = "Exemption Request",
+                        To = course.CourseInstructor.Email,
+                        PlainText = "",
+                        HtmlContent = $"<p> {student.FirstName} placed a new request for the course {course.CourseName} that is instructed by you.</p>"
+                    };
+                    await _emailSenderService.SendEmail(emailModel);
+                }
                 return true;
             }
             catch
@@ -43,18 +65,34 @@ namespace StudentsApplicationProj.Server.Services
             }
         }
 
-        public bool AppealForDeclinedApplication(int applicationId, int studentId)
+        public async Task<bool> AppealForDeclinedApplication(int applicationId, int studentId)
         {
             try
             {
                 var application = _context.CourseApplication
                     .Where(x => x.Id == applicationId && x.StudentCourse.StudentId == studentId)
+                    .Include(x => x.StudentCourse)
+                    .ThenInclude(x => x.Student)
                     .FirstOrDefault();
-                _context.SaveChanges();
-                if(application != null)
+                if(application != null && application.StudentCourse != null)
                 {
                     application.Status = ApplicationStatus.Created;
-                    _context.SaveChanges();
+                    await _context.SaveChangesAsync();
+                    var course = _context.Course
+                        .Where(x => x.Id == application.StudentCourse.CourseId)
+                        .Include(x => x.CourseInstructor)
+                        .FirstOrDefault();
+                    if(course != null & course.CourseInstructor != null)
+                    {
+                        var emailModel = new SendGridModel
+                        {
+                            Subject = "Exemption Appeal",
+                            To = course.CourseInstructor.Email,
+                            PlainText = "",
+                            HtmlContent = $"<p> {application.StudentCourse.Student.FirstName} appealed the request for the course {course.CourseName} that is instructed by you.</p>"
+                        };
+                        await _emailSenderService.SendEmail(emailModel);
+                    }
                     return true;
                 }
                 return false;
@@ -94,7 +132,7 @@ namespace StudentsApplicationProj.Server.Services
                 if(alreadyAppliedCourses != null && alreadyAppliedCourses.Count > 0)
                 {
                     return courses.Where(item =>
-                        alreadyAppliedCourses.Any(id => id != item.Id))
+                        !alreadyAppliedCourses.Any(id => id == item.Id))
                         .ToList();
                 }
                 return courses;

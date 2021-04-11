@@ -43,6 +43,7 @@ namespace StudentsApplicationProj.Server
             services.AddTransient<IDepartmentHeadService, DepartmentHeadService>();
             services.AddTransient<IInstructorService, InstructorService>();
             services.AddTransient<IAdminService, AdminService>();
+            services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddDbContext<StudentDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StudentDbConnectionString")));
 
             string secretKey = Configuration.GetValue<string>("SecretKey");

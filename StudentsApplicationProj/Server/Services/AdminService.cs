@@ -3,6 +3,7 @@ using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Shared.Enum;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace StudentsApplicationProj.Server.Services
 {
@@ -12,17 +13,20 @@ namespace StudentsApplicationProj.Server.Services
         List<Department> GetDepartments();
         List<SystemUser> GetInstructors(int departmentId);
         List<SystemUser> GetAccountsToApprove();
-        bool AddCourse(Course course);
-        bool ApproveOrDeleteAccount(int accountId, bool approveOrDelete);
+        Task<bool> AddCourse(Course course);
+        Task<bool> ApproveOrDeleteAccount(int accountId, bool approveOrDelete);
         bool AssignCourse(int courseId, int accountId);
     }
 
     public class AdminService: IAdminService
     {
         private readonly StudentDbContext _context;
-        public AdminService(StudentDbContext context)
+        private readonly IEmailSenderService _emailSenderService;
+
+        public AdminService(StudentDbContext context, IEmailSenderService emailSenderService)
         {
             _context = context;
+            _emailSenderService = emailSenderService;
         }
 
         public List<StudentCourse> GetApplications()
@@ -58,13 +62,27 @@ namespace StudentsApplicationProj.Server.Services
                 .ToList();
         }
 
-        public bool AddCourse(Course course)
+        public async Task<bool> AddCourse(Course course)
         {
             try
             {
                 course.DepartmentId = 1;
                 _context.Course.Add(course);
                 _context.SaveChanges();
+                var instructor = _context.SystemUser
+                    .Where(x => x.Id == course.CourseInstructorId)
+                    .FirstOrDefault();
+                if(instructor != null)
+                {
+                    var emailModel = new SendGridModel
+                    {
+                        Subject ="New Course Added",
+                        To = instructor.Email,
+                        PlainText = "",
+                        HtmlContent = $"<p> Admin has assigned you a new course {course.CourseName}</p>"
+                    };
+                    _emailSenderService.SendEmail(emailModel);
+                }
                 return true;
             }
             catch
@@ -73,7 +91,7 @@ namespace StudentsApplicationProj.Server.Services
             }
         }
 
-        public bool ApproveOrDeleteAccount(int accountId, bool approveOrDelete)
+        public async Task<bool> ApproveOrDeleteAccount(int accountId, bool approveOrDelete)
         {
             var systemUser = _context.SystemUser
                 .Where(x => x.Id == accountId)
@@ -94,12 +112,20 @@ namespace StudentsApplicationProj.Server.Services
                             .FirstOrDefault();
                         dept.DepartmentHeadId = accountId;
                     }
+                    var emailModel = new SendGridModel
+                    {
+                        Subject = "Account approval",
+                        To = systemUser.Email,
+                        PlainText = "",
+                        HtmlContent = $"<p> Admin has approved your acount, you can sign in now.</p>"
+                    };
+                    await _emailSenderService.SendEmail(emailModel);
                 }
                 else
                 {
                     _context.SystemUser.Remove(systemUser);
                 }
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch

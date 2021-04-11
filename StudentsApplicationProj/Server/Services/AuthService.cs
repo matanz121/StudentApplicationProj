@@ -17,9 +17,12 @@ namespace StudentsApplicationProj.Server.Services
     public class AuthService : IAuthService
     {
         private readonly StudentDbContext _context;
-        public AuthService(StudentDbContext context)
+        private readonly IEmailSenderService _emailSenderService;
+
+        public AuthService(StudentDbContext context, IEmailSenderService emailSenderService)
         {
             _context = context;
+            _emailSenderService = emailSenderService;
         }
 
         public SystemUser Login(LoginRequest loginModel)
@@ -46,6 +49,14 @@ namespace StudentsApplicationProj.Server.Services
             {
                 _context.SystemUser.Add(user);
                 await _context.SaveChangesAsync();
+                var emailModel = new SendGridModel
+                {
+                    Subject = "Account created",
+                    To = user.Email,
+                    PlainText = "",
+                    HtmlContent = $"<p> Your account for {user.UserRole} has been created successfully, you can login after an admin approval</p>"
+                };
+                await _emailSenderService.SendEmail(emailModel);
                 return true;
             }
             catch
