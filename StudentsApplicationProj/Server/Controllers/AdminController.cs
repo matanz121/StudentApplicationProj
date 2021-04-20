@@ -32,6 +32,11 @@ namespace StudentsApplicationProj.Server.Controllers
                 _mapper.Map<List<UserAccountModel>>(_adminService.GetInstructors(departmentId))
             );
 
+        [HttpGet, Route("headsOfDepartments")]
+        public IActionResult GetHeadsOfDepartments() => Ok(
+        _mapper.Map<List<UserAccountModel>>(_adminService.GetHeadsOfDepartments())
+            );
+
         [HttpGet, Route("accountsToApprove")]
         public IActionResult GetAccountsToApprove() => Ok(
                 _mapper.Map<List<UserAccountModel>>(_adminService.GetAccountsToApprove())
@@ -45,6 +50,18 @@ namespace StudentsApplicationProj.Server.Controllers
             if (status)
             {
                 return Ok(courseModel);
+            }
+            return BadRequest();
+        }
+
+        [HttpPost, Route("department")]
+        public async Task<IActionResult> AddDepartment(DepartmentModel departmentModel)
+        {
+            var department = _mapper.Map<Department>(departmentModel);
+            var status = await _adminService.AddDepartment(department);
+            if (status)
+            {
+                return Ok(departmentModel);
             }
             return BadRequest();
         }

@@ -12,8 +12,10 @@ namespace StudentsApplicationProj.Server.Services
         List<StudentCourse> GetApplications();
         List<Department> GetDepartments();
         List<SystemUser> GetInstructors(int departmentId);
+        List<SystemUser> GetHeadsOfDepartments();
         List<SystemUser> GetAccountsToApprove();
         Task<bool> AddCourse(Course course);
+        Task<bool> AddDepartment(Department department);
         Task<bool> ApproveOrDeleteAccount(int accountId, bool approveOrDelete);
         bool AssignCourse(int courseId, int accountId);
     }
@@ -54,6 +56,14 @@ namespace StudentsApplicationProj.Server.Services
                 .ToList();
         }
 
+        public List<SystemUser> GetHeadsOfDepartments()
+        {
+            return _context.SystemUser
+                .Include(x => x.Department)
+                .Where(x => x.UserRole == UserRole.DepartmentHead && (x.AccountStatus == true))
+                .ToList();
+        }
+
         public List<SystemUser> GetAccountsToApprove()
         {
             return _context.SystemUser
@@ -81,7 +91,35 @@ namespace StudentsApplicationProj.Server.Services
                         PlainText = "",
                         HtmlContent = $"<p> Admin has assigned you a new course {course.CourseName}</p>"
                     };
-                    _emailSenderService.SendEmail(emailModel);
+                    await _emailSenderService.SendEmail(emailModel);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> AddDepartment(Department department)
+        {
+            try
+            {
+                _context.Department.Add(department);
+                _context.SaveChanges();
+                var headOfDepartment = _context.SystemUser
+                    .Where(x => x.Id == department.DepartmentHeadId)
+                    .FirstOrDefault();
+                if (headOfDepartment != null)
+                {
+                    var emailModel = new SendGridModel
+                    {
+                        Subject = "New Department Added",
+                        To = headOfDepartment.Email,
+                        PlainText = "",
+                        HtmlContent = $"<p> Admin has assigned you a new department {department.DepartmentName}</p>"
+                    };
+                    await _emailSenderService.SendEmail(emailModel);
                 }
                 return true;
             }
