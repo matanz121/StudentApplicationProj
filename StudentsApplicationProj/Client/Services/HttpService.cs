@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using StudentsApplicationProj.Client.Models;
 using StudentsApplicationProj.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace StudentsApplicationProj.Client.Services
         Task<T> Put<T>(string uri, object value);
         Task<T> Delete<T>(string uri);
         Task<T> Post<T>(string uri, object value);
+        Task<object> UploadFiles(MultipartFormDataContent content, string uri);
     }
 
     public class HttpService: IHttpService
@@ -52,6 +54,15 @@ namespace StudentsApplicationProj.Client.Services
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, uri);
             return await sendRequest<T>(request);
+        }
+
+        public async Task<object> UploadFiles(MultipartFormDataContent content, string uri)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, uri)
+            {
+                Content = content
+            };
+            return await sendRequest<object>(request);
         }
 
         private async Task<T> sendRequest<T>(HttpRequestMessage request)

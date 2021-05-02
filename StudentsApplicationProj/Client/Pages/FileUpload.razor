@@ -1,0 +1,123 @@
+﻿@page "/file-upload/{ApplicationId:int}"
+@inject IHttpService _httpService
+@inject IClientAuthService _authService
+@inject NavigationManager _navigationManager
+@inject ISnackbar _snackbar
+
+<div style="width: 600px; margin: auto">
+    <h3>Add Course Files</h3>
+    <MudCard>
+        <MudCardContent>
+            <div class="mb-2">
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Info"
+                           StartIcon="@Icons.Filled.CloudUpload"
+                           Disabled="@IsLoading"
+                           for="gradeSheet">
+                    Upload Grade Sheet
+                </MudButton>
+                @if (GradeSheet != null)
+                {
+                    <MudText>@GradeSheet.Name</MudText>
+                }
+                <InputFile id="gradeSheet" OnChange="@UploadGradeSheet" hidden />
+            </div>
+            <div class="mb-2">
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Info"
+                           StartIcon="@Icons.Filled.CloudUpload"
+                           Disabled="@IsLoading"
+                           for="syllabus">
+                    Upload Syllabus
+                </MudButton>
+                @if (Syllabus != null)
+                {
+                    <MudText>@Syllabus.Name</MudText>
+                }
+                <InputFile id="syllabus" OnChange="@UploadSyllabus" hidden />
+            </div>
+            <div>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Info"
+                           StartIcon="@Icons.Filled.CloudUpload"
+                           Disabled="@IsLoading"
+                           for="certificate">
+                    Upload Certificate
+                </MudButton>
+                @if (Certificate != null)
+                {
+                    <MudText>@Certificate.Name</MudText>
+                }
+                <InputFile id="certificate" OnChange="@UploadCertificate" hidden />
+            </div>
+        </MudCardContent>
+        <br />
+        <MudCardActions>
+            <MudButton FullWidth="true" @onclick="@UploadFiles" Variant="Variant.Filled" Color="Color.Primary" Disabled="IsLoading">Submit</MudButton>
+        </MudCardActions>
+    </MudCard>
+</div>
+
+@code {
+    public bool IsLoading { get; set; }
+    public IBrowserFile GradeSheet { get; set; }
+    public IBrowserFile Syllabus { get; set; }
+    public IBrowserFile Certificate { get; set; }
+    [Parameter]
+    public int ApplicationId { get; set; }
+
+    private void UploadGradeSheet(InputFileChangeEventArgs e)
+    {
+        GradeSheet = e.File;
+    }
+
+    private void UploadSyllabus(InputFileChangeEventArgs e)
+    {
+        Syllabus = e.File;
+    }
+
+    private void UploadCertificate(InputFileChangeEventArgs e)
+    {
+        Certificate = e.File;
+    }
+
+    private async Task UploadFiles()
+    {
+        using var content = new MultipartFormDataContent();
+        if (GradeSheet != null)
+        {
+            var fileContent = new StreamContent(GradeSheet.OpenReadStream());
+            content.Add(fileContent, "GradeSheet", GradeSheet.Name);
+        }
+        if (Syllabus != null)
+        {
+            var fileContent = new StreamContent(Syllabus.OpenReadStream());
+            content.Add(fileContent, "Syllabus", Syllabus.Name);
+        }
+        if (Certificate != null)
+        {
+            var fileContent = new StreamContent(Certificate.OpenReadStream());
+            content.Add(fileContent, "Certificate", Certificate.Name);
+        }
+        try
+        {
+            await _httpService.UploadFiles(content, $"/api/student/upload-file/{ApplicationId}");
+            _snackbar.Add("Successfully uploaded!", Severity.Success);
+            GradeSheet = null;
+            Syllabus = null;
+            Certificate = null;
+        }
+        catch
+        {
+            _snackbar.Add("Something went wrong, please try again", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+}

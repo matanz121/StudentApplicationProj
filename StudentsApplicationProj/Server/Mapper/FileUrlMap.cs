@@ -11,14 +11,9 @@ namespace StudentsApplicationProj.Server.Mapper
         {
             builder.ToTable("FileUrl");
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.FileName).HasColumnType("nvarchar(128)");
-            builder.Property(x => x.Url).IsRequired().HasColumnType("nvarchar(258)");
-            builder.Property(x => x.CourseApplicationId).IsRequired().HasColumnType("int");
-
-            builder.HasOne(file => file.CourseApplication)
-                .WithMany(application => application.FileUrls)
-                .HasForeignKey(file => file.CourseApplicationId)
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(x => x.GradeSheetPath).HasColumnType("nvarchar(256)");
+            builder.Property(x => x.SyllabusPath).HasColumnType("nvarchar(256)");
+            builder.Property(x => x.CertificatePath).HasColumnType("nvarchar(256)");
         }
     }
 }

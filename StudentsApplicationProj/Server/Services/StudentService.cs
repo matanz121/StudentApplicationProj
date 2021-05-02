@@ -11,9 +11,10 @@ namespace StudentsApplicationProj.Server.Services
     public interface IStudentService
     {
         List<StudentCourse> GetApplicationList(int studentId);
-        Task<bool> AddNewApplication(int studentId, int courseId, CourseApplication studentCourse);
+        Task<int> AddNewApplication(int studentId, int courseId, CourseApplication studentCourse);
         Task<bool> AppealForDeclinedApplication(int applicationId, int studentId);
         List<Course> GetCourses(int studentId);
+        Task<bool> UpdateFilePath(int applicationId, string gradesheetPath, string syllabusPath, string certificatePath);
     }
 
     public class StudentService : IStudentService
@@ -27,7 +28,7 @@ namespace StudentsApplicationProj.Server.Services
             _emailSenderService = emailSenderService;
         }
 
-        public async Task<bool> AddNewApplication(int studentId, int courseId, CourseApplication courseApplication)
+        public async Task<int> AddNewApplication(int studentId, int courseId, CourseApplication courseApplication)
         {
             try
             {
@@ -57,11 +58,11 @@ namespace StudentsApplicationProj.Server.Services
                     };
                     await _emailSenderService.SendEmail(emailModel);
                 }
-                return true;
+                return courseApplication.Id;
             }
             catch
             {
-                return false;
+                return -1;
             }
         }
 
@@ -138,6 +139,43 @@ namespace StudentsApplicationProj.Server.Services
                 return courses;
             }
             return new List<Course>();
+        }
+
+        public async Task<bool> UpdateFilePath(int applicationId, string gradesheetPath, string syllabusPath, string certificatePath)
+        {
+            bool status = false;
+            var application = _context.CourseApplication
+                .Where(x => x.Id == applicationId)
+                .Include(x => x.FileUrls)
+                .FirstOrDefault();
+            if(application != null)
+            {
+                if(application.FileUrls == null)
+                {
+                    application.FileUrls = new FileUrl
+                    {
+                        GradeSheetPath = gradesheetPath,
+                        SyllabusPath = syllabusPath,
+                        CertificatePath = certificatePath
+                    };
+                }
+                else
+                {
+                    application.FileUrls.GradeSheetPath = gradesheetPath;
+                    application.FileUrls.SyllabusPath = syllabusPath;
+                    application.FileUrls.CertificatePath = certificatePath;
+                }
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    status = true;
+                }
+                catch
+                {
+                    status = false;
+                }
+            }
+            return status;
         }
     }
 }

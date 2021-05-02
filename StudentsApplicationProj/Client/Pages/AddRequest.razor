@@ -56,9 +56,9 @@
     {
         try
         {
-            await _httpService.Post<object>("/api/student/application", ApplicationRequest);
-            _snackbar.Add("Successfully applied!", Severity.Success);
-            ApplicationRequest = new();
+            var response = await _httpService.Post<IdModel>("/api/student/application", ApplicationRequest);
+            _snackbar.Add("Successfully applied! Please upload necessary files", Severity.Success);
+            _navigationManager.NavigateTo($"/file-upload/{response.Id}");
         }
         catch
         {

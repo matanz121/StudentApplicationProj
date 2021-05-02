@@ -36,7 +36,7 @@ namespace StudentsApplicationProj.Server.Services
                 .Include(x => x.Student)
                 .Include(x => x.CourseApplication)
                 .ThenInclude(x => x.FileUrls)
-                .Where(x => x.CourseApplication.Status != ApplicationStatus.ApprovedByAll)
+                .Where(x => x.CourseApplication.Status != ApplicationStatus.ApprovedByAll && x.CourseApplication.Status != ApplicationStatus.Declined)
                 .ToList();
         }
 

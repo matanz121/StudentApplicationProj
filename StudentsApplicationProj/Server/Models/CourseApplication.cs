@@ -1,6 +1,5 @@
 ﻿using StudentsApplicationProj.Shared.Enum;
 using System;
-using System.Collections.Generic;
 
 namespace StudentsApplicationProj.Server.Models
 {
@@ -11,7 +10,7 @@ namespace StudentsApplicationProj.Server.Models
         public string ApplicationBody { get; set; }
         public ApplicationStatus Status { get; set; }
         public DateTime ApplicationDateTime { get; set; }
-        public IList<FileUrl> FileUrls { get; set; }
+        public FileUrl FileUrls { get; set; }
         public StudentCourse StudentCourse { get; set; }
         public int StudentCourseId { get; set; }
     }
