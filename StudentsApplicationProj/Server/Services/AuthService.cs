@@ -12,6 +12,9 @@ namespace StudentsApplicationProj.Server.Services
     {
         SystemUser Login(LoginRequest loginModel);
         Task<bool> Register(RegisterRequest registerModel);
+        Task<bool> UpdateProfile (UpdateProfileRequest updateProfileModel, int UserId);
+        
+        //Task<bool> ChangePassword(ChangePasswordRequest passwordModel);
     }
 
     public class AuthService : IAuthService
@@ -64,6 +67,52 @@ namespace StudentsApplicationProj.Server.Services
                 return false;
             }
         }
+
+        public async Task<bool> UpdateProfile(UpdateProfileRequest updateProfileModel, int UserId)
+        {
+            var systemUser = _context.SystemUser
+                .Where(x => x.Id == UserId)
+                .FirstOrDefault();
+            if (systemUser == null)
+            {
+                return false;
+            }
+            try
+            {
+                systemUser.FirstName = updateProfileModel.FirstName;
+                systemUser.LastName = updateProfileModel.LastName;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        //public async Task<bool> ChangePassword(ChangePasswordRequest passwordModel)
+        //{
+        //    var systemUser = _context.SystemUser
+        //        .Where(x => x.Email == passwordModel.Email)
+        //        .FirstOrDefault();
+        //    if (systemUser == null)
+        //    {
+        //        return false;
+        //    }
+        //    try
+        //    {
+        //        systemUser.FirstName = ChangePasswordRequest.FirstName;
+        //        systemUser.LastName = ChangePasswordRequest.LastName;
+
+        //        await _context.SaveChangesAsync();
+        //        return true;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
 
         private string HashPassword(string password)
         {
