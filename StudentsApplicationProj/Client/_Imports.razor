@@ -20,3 +20,9 @@
 @using StudentsApplicationProj.Client.Models
 
 @using StudentsApplicationProj.Shared.Enum
+
+@inject HttpClient _httpClient
+@inject ISnackbar _snackbar
+@inject NavigationManager navigationManager
+@inject IClientAuthService  _clientAuthService
+@inject IHttpService _httpService
