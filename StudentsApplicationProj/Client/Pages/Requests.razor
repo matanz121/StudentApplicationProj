@@ -15,11 +15,12 @@
         <MudTh>Application Body</MudTh>
         <MudTh>Files</MudTh>
         <MudTh>Date</MudTh>
+        <MudTh>Notes</MudTh>
         @if (_authService.User != null && _authService.User.UserRole == UserRole.Student)
         {
             <MudTh>Status</MudTh>
         }
-        <MudTh>Action</MudTh>
+        <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
         @if (_authService.User != null && _authService.User.UserRole != UserRole.Student)
@@ -44,6 +45,7 @@
             }
         </MudTh>
         <MudTd>@context.ApplicationDateTime</MudTd>
+        <MudIconButton Style="margin-top:10px" Icon="@Icons.Material.Filled.Info" Color="Color.Primary" @onclick="() => ViewNoteMessage(context.Id)">Note</MudIconButton>
         @if (_authService.User != null && _authService.User.UserRole != UserRole.Student)
         {
             <MudTd>
@@ -57,16 +59,12 @@
             <MudTh>
                 <MudTh>@context.Status.ToString()</MudTh>
             </MudTh>
+
             @if (context.Status == ApplicationStatus.Declined)
             {
                 <MudTd>
-                    <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" @onclick="() => ViewNoteMessage(context.Id)">Note</MudButton>
                     <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" OnClick="@(() => _navigationManager.NavigateTo($"/appeal/{context.Id}"))">Appeal</MudButton>
                 </MudTd>
-            }
-            else
-            {
-                <MudButton Variant="Variant.Filled" ButtonType="MudBlazor.ButtonType.Submit" Color="Color.Primary" @onclick="() => ViewNoteMessage(context.Id)">Note</MudButton>
             }
         }
     </RowTemplate>
