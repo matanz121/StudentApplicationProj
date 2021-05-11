@@ -35,6 +35,7 @@ namespace StudentsApplicationProj.Server.Services
             {
                 courseApplication.Status = ApplicationStatus.Created;
                 courseApplication.ApplicationDateTime = DateTime.Now;
+                courseApplication.NoteMessage = "No comment yet";
                 _context.StudentCourse.Add(new StudentCourse {
                     CourseId = courseId,
                     StudentId = studentId,
@@ -81,6 +82,7 @@ namespace StudentsApplicationProj.Server.Services
                     application.Status = ApplicationStatus.Created;
                     application.ApplicationName = applicationName;
                     application.ApplicationBody = applicationBody;
+                    application.NoteMessage = null;
                     await _context.SaveChangesAsync();
                     var course = _context.Course
                         .Where(x => x.Id == application.StudentCourse.CourseId)
