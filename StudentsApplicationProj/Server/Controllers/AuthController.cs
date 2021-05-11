@@ -44,5 +44,28 @@ namespace StudentsApplicationProj.Server.Controllers
             }
             return BadRequest();
         }
+
+                [HttpPut, Route("updateprofile")]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileRequest updateProfileModel)
+        {
+            var userInfo = _tokenService.GetUserInfoFromToken(Request);
+            var result = await _authService.UpdateProfile(updateProfileModel, userInfo.UserId);
+            if (result)
+            {
+                return Ok(new { });
+            }
+            return BadRequest();
+        }
+
+        //[HttpPut, Route("changepassword")]
+        //public async Task<IActionResult> ChangePassword(ChangePasswordRequest passwordModel)
+        //{
+        //    var result = await _authService.ChangePassword(passwordModel);
+        //    if (result)
+        //    {
+        //        return Ok(new { });
+        //    }
+        //    return BadRequest();
+        //}
     }
 }
