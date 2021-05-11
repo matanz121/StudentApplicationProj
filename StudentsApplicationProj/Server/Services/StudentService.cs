@@ -82,7 +82,7 @@ namespace StudentsApplicationProj.Server.Services
                     application.Status = ApplicationStatus.Created;
                     application.ApplicationName = applicationName;
                     application.ApplicationBody = applicationBody;
-                    application.NoteMessage = null;
+                    application.NoteMessage = "No new comments on this appeal yet";
                     await _context.SaveChangesAsync();
                     var course = _context.Course
                         .Where(x => x.Id == application.StudentCourse.CourseId)
