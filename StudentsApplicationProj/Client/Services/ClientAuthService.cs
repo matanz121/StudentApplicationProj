@@ -15,6 +15,8 @@ namespace StudentsApplicationProj.Client.Services
         Task Login(LoginRequest loginModel);
         Task Register(RegisterRequest registerModel);
         Task Logout();
+        Task UpdateProfileAsync(UpdateProfileRequest updateProfileModel);
+        Task ChangePasswordAsync(ChangePasswordRequest passwordModel);
     }
 
     public class ClientAuthService : IClientAuthService
@@ -58,6 +60,16 @@ namespace StudentsApplicationProj.Client.Services
             User = null;
             await _localStorage.RemoveItemAsync("user");
             _navigationManager.NavigateTo("/auth/login");
+        }
+
+                public async Task UpdateProfileAsync(UpdateProfileRequest updateProfileModel)
+        {
+            await _httpService.Put<object>("/api/auth/updateprofile", updateProfileModel);
+        }
+
+        public async Task ChangePasswordAsync(ChangePasswordRequest passwordModel)
+        {
+            await _httpService.Put<object>("/api/auth/changepassword", passwordModel);
         }
     }
 }
