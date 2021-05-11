@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Shared.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace StudentsApplicationProj.Server.Services
     public interface IInstructorService
     {
         List<StudentCourse> GetApplicationList(int instructorId);
-        Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status);
+        Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status, string message);
     }
 
     public class InstructorService : IInstructorService
@@ -23,7 +24,7 @@ namespace StudentsApplicationProj.Server.Services
             _emailSenderService = emailSenderService;
         }
 
-        public async Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status)
+        public async Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status, string message)
         {
             if (status == ApplicationStatus.ApprovedByInstructor || status == ApplicationStatus.Declined)
             {
@@ -39,6 +40,7 @@ namespace StudentsApplicationProj.Server.Services
                     try
                     {
                         application.Status = status;
+                        application.NoteMessage = message;
                         await _context.SaveChangesAsync();
                         if(application.StudentCourse.Course != null && application.StudentCourse.Student != null)
                         {

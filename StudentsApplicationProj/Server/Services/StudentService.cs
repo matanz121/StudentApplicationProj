@@ -12,9 +12,10 @@ namespace StudentsApplicationProj.Server.Services
     {
         List<StudentCourse> GetApplicationList(int studentId);
         Task<int> AddNewApplication(int studentId, int courseId, CourseApplication studentCourse);
-        Task<bool> AppealForDeclinedApplication(int applicationId, int studentId);
+        Task<bool> AppealForDeclinedApplication(int applicationId, int studentId, string applicationName, string applicationBody);
         List<Course> GetCourses(int studentId);
         Task<bool> UpdateFilePath(int applicationId, string gradesheetPath, string syllabusPath, string certificatePath);
+        Task<CourseApplication> GetApplication(int applicationId);
     }
 
     public class StudentService : IStudentService
@@ -66,7 +67,7 @@ namespace StudentsApplicationProj.Server.Services
             }
         }
 
-        public async Task<bool> AppealForDeclinedApplication(int applicationId, int studentId)
+        public async Task<bool> AppealForDeclinedApplication(int applicationId, int studentId, string applicationName, string applicationBody)
         {
             try
             {
@@ -78,6 +79,8 @@ namespace StudentsApplicationProj.Server.Services
                 if(application != null && application.StudentCourse != null)
                 {
                     application.Status = ApplicationStatus.Created;
+                    application.ApplicationName = applicationName;
+                    application.ApplicationBody = applicationBody;
                     await _context.SaveChangesAsync();
                     var course = _context.Course
                         .Where(x => x.Id == application.StudentCourse.CourseId)
@@ -176,6 +179,14 @@ namespace StudentsApplicationProj.Server.Services
                 }
             }
             return status;
+        }
+
+        public async Task<CourseApplication> GetApplication(int applicationId)
+        {
+            return await _context.CourseApplication
+                .Where(x => x.Id == applicationId)
+                .Include(x => x.StudentCourse)
+                .FirstOrDefaultAsync();
         }
     }
 }

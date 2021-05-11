@@ -13,7 +13,6 @@ namespace StudentsApplicationProj.Server.Models
         {
             builder.ApplyConfiguration(new CourseMap());
             builder.ApplyConfiguration(new DepartmentMap());
-            builder.ApplyConfiguration(new InstructorCourseMap());
             builder.ApplyConfiguration(new StudentCourseMap());
             builder.ApplyConfiguration(new SystemUserMap());
             builder.ApplyConfiguration(new CourseApplicationMap());
@@ -22,7 +21,6 @@ namespace StudentsApplicationProj.Server.Models
 
         public DbSet<Course> Course { get; set; }
         public DbSet<Department> Department { get; set; }
-        public DbSet<InstructorCourse> InstructorCourse { get; set; }
         public DbSet<StudentCourse> StudentCourse { get; set; }
         public DbSet<SystemUser> SystemUser { get; set; }
         public DbSet<CourseApplication> CourseApplication { get; set; }

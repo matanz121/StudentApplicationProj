@@ -28,13 +28,13 @@ namespace StudentsApplicationProj.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost, Route("appeal")]
-        public async Task<IActionResult> AppealApplication(CourseApplicationViewModel application)
+        [HttpPost, Route("appeal/{applicationId}")]
+        public async Task<IActionResult> AppealApplication(int applicationId, ApplicationRequestFormModel application)
         {
             var userInfo = _tokenService.GetUserInfoFromToken(Request);
             if (userInfo.UserRole == UserRole.Student && userInfo.UserId > 0)
             {
-                bool status = await _studentService.AppealForDeclinedApplication(application.Id, userInfo.UserId);
+                bool status = await _studentService.AppealForDeclinedApplication(applicationId, userInfo.UserId, application.ApplicationName, application.ApplicationBody);
                 if (status)
                 {
                     return Ok(application);
@@ -72,8 +72,25 @@ namespace StudentsApplicationProj.Server.Controllers
             return BadRequest();
         }
 
+        [HttpGet, Route("application/{applicationId}")]
+        public async Task<IActionResult> GetApplication(int applicationId)
+        {
+            var userInfo = _tokenService.GetUserInfoFromToken(Request);
+            if (userInfo.UserRole == UserRole.Student && userInfo.UserId > 0)
+            {
+                CourseApplication courseApplication = await _studentService.GetApplication(applicationId);
+                if (courseApplication != null)
+                {
+                    var response = _mapper.Map<ApplicationRequestFormModel>(courseApplication);
+                    return Ok(response);
+                }
+            }
+            return BadRequest();
+        }
+
         [HttpPost, Route("upload-file/{applicationId}")]
         public async Task<IActionResult> UploadFile([FromForm]FileUploadModel model, int applicationId)
+        
         {
             string gradesheetPath = null;
             string syllabusPath = null;

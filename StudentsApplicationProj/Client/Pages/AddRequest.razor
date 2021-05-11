@@ -1,21 +1,32 @@
 ﻿@page "/add-request"
+@page "/appeal/{ApplicationId:int}"
 @inject IHttpService _httpService
 @inject IClientAuthService _authService
 @inject NavigationManager _navigationManager
 @inject ISnackbar _snackbar
 
 <div style="width: 600px; margin-top: 120px; margin: auto">
-    <h3>Create a new Request</h3>
+    @if (!IsForAppeal)
+    {
+        <h3>Create a new Request</h3>
+    }
+    else
+    {
+        <h3>Appeal for Request</h3>
+    }
     <EditForm Model="@ApplicationRequest" OnValidSubmit="Apply">
         <MudCard>
             <DataAnnotationsValidator />
             <MudCardContent>
-                <MudSelect Label="Select Course" @bind-Value="ApplicationRequest.CourseId">
-                    @foreach (var course in Courses)
-                    {
-                        <MudSelectItem Value="@course.Id">@course.CourseName</MudSelectItem>
-                    }
-                </MudSelect>
+                @if (!IsForAppeal)
+                {
+                    <MudSelect Label="Select Course" @bind-Value="ApplicationRequest.CourseId">
+                        @foreach (var course in Courses)
+                            {
+                            <MudSelectItem Value="@course.Id">@course.CourseName</MudSelectItem>
+                            }
+                    </MudSelect>
+                }
                 <MudTextField Label="Application Name" @bind-Value="ApplicationRequest.ApplicationName" For="@(() => ApplicationRequest.ApplicationName)" />
                 <MudTextField Label="Application Body" @bind-Value="ApplicationRequest.ApplicationBody" For="@(() => ApplicationRequest.ApplicationBody)" Lines="3" />
             </MudCardContent>
@@ -29,6 +40,9 @@
 
 @code {
 
+    [Parameter]
+    public int ApplicationId { get; set; }
+    public bool IsForAppeal { get; set; }
     private ApplicationRequestFormModel ApplicationRequest { get; set; } = new();
     private List<CourseModel> Courses { get; set; } = new();
     private bool IsLoading { get; set; }
@@ -39,7 +53,16 @@
         {
             try
             {
-                Courses = await _httpService.Get<List<CourseModel>>("/api/student/courses");
+
+                if (ApplicationId > 0)
+                {
+                    ApplicationRequest = await _httpService.Get<ApplicationRequestFormModel>($"/api/student/application/{ApplicationId}");
+                    IsForAppeal = true;
+                }
+                else
+                {
+                    Courses = await _httpService.Get<List<CourseModel>>("/api/student/courses");
+                }
             }
             catch
             {
@@ -56,9 +79,17 @@
     {
         try
         {
-            var response = await _httpService.Post<IdModel>("/api/student/application", ApplicationRequest);
-            _snackbar.Add("Successfully applied! Please upload necessary files", Severity.Success);
-            _navigationManager.NavigateTo($"/file-upload/{response.Id}");
+            if (ApplicationId > 0)
+            {
+                await _httpService.Post<IdModel>($"/api/student/appeal/{ApplicationId}", ApplicationRequest);
+                _navigationManager.NavigateTo($"/file-upload/{ApplicationId}");
+            }
+            else
+            {
+                var response = await _httpService.Post<IdModel>("/api/student/application", ApplicationRequest);
+                _navigationManager.NavigateTo($"/file-upload/{response.Id}");
+            }
+
         }
         catch
         {
