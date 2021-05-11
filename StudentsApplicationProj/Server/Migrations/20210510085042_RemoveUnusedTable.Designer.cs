@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentsApplicationProj.Server.Models;
 
 namespace StudentsApplicationProj.Server.Migrations
 {
     [DbContext(typeof(StudentDbContext))]
-    partial class StudentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210510085042_RemoveUnusedTable")]
+    partial class RemoveUnusedTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -65,9 +67,6 @@ namespace StudentsApplicationProj.Server.Migrations
                     b.Property<string>("ApplicationName")
                         .IsRequired()
                         .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("NoteMessage")
-                        .HasColumnType("nvarchar(MAX)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

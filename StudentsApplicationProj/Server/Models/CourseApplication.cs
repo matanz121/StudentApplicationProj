@@ -13,5 +13,6 @@ namespace StudentsApplicationProj.Server.Models
         public FileUrl FileUrls { get; set; }
         public StudentCourse StudentCourse { get; set; }
         public int StudentCourseId { get; set; }
+        public string NoteMessage { get; set; }
     }
 }

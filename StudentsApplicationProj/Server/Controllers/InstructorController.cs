@@ -20,7 +20,7 @@ namespace StudentsApplicationProj.Server.Controllers
         [HttpPost, Route("acceptOrDecline")]
         public async Task<IActionResult> AcceptOrDeclineApplication(CourseApplicationViewModel application)
         {
-            bool status = await _instructorService.AcceptOrDeclineApplication(application.Id, application.Status);
+            bool status = await _instructorService.AcceptOrDeclineApplication(application.Id, application.Status, application.NoteMessage);
             if (status)
             {
                 return Ok(application);

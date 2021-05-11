@@ -15,6 +15,7 @@ namespace StudentsApplicationProj.Server.Mapper
             builder.Property(x => x.ApplicationName).IsRequired().HasColumnType("nvarchar(128)");
             builder.Property(x => x.ApplicationBody).IsRequired().HasColumnType("nvarchar(1024)");
             builder.Property(x => x.StudentCourseId).IsRequired().HasColumnType("int");
+            builder.Property(x => x.NoteMessage).HasColumnType("nvarchar(MAX)");
         }
     }
 }
