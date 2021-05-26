@@ -10,8 +10,8 @@ using StudentsApplicationProj.Server.Models;
 namespace StudentsApplicationProj.Server.Migrations
 {
     [DbContext(typeof(StudentDbContext))]
-    [Migration("20210511183442_Initial")]
-    partial class Initial
+    [Migration("20210526052051_AddNewDepartment")]
+    partial class AddNewDepartment
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -107,7 +107,17 @@ namespace StudentsApplicationProj.Server.Migrations
                         new
                         {
                             Id = 1,
-                            DepartmentName = "Computer Science and Engineering"
+                            DepartmentName = "CSE"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DepartmentName = "EEE"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DepartmentName = "ME"
                         });
                 });
 

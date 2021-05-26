@@ -13,11 +13,24 @@ namespace StudentsApplicationProj.Server.Mapper
             builder.Property(x => x.DepartmentName).IsRequired().HasColumnType("nvarchar(128)");
             builder.Property(x => x.DepartmentHeadId).HasColumnType("int");
 
-            builder.HasData(new Department
+            builder.HasData(
+            new Department
             {
                 Id = 1,
-                DepartmentName = "Computer Science and Engineering"
-            });
+                DepartmentName = "CSE"
+            },
+            new Department
+            {
+                Id = 2,
+                DepartmentName = "EEE"
+            },
+
+            new Department
+            {
+                Id = 3,
+                DepartmentName = "ME"
+            }
+            );
         }
     }
 }

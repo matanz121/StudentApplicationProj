@@ -1,6 +1,7 @@
 ﻿@page "/auth/register"
 @layout AuthLayout
 @inject IClientAuthService  _clientAuthService
+@inject IHttpService _httpService
 @inject NavigationManager navigationManager
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
@@ -21,7 +22,12 @@
                               @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
                 <MudTextField Label="Confirm Password" HelperText="Repeat your password" Class="mt-3"
                               @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" />
-
+                <MudSelect Label="Department" @bind-Value="model.DepartmentId">
+                    @foreach (var dept in Departments)
+                    {
+                        <MudSelectItem Value="@dept.Id">@dept.DepartmentName</MudSelectItem>
+                    }
+                </MudSelect>
                 <MudSelect Label="Sign up as" @bind-Value="model.UserRole">
                     <MudSelectItem Value="@(UserRole.Student)">Student</MudSelectItem>
                     <MudSelectItem Value="@(UserRole.Instructor)">Instructor</MudSelectItem>
@@ -40,10 +46,25 @@
 </div>
 
 @code {
-    RegisterRequest model = new RegisterRequest() { UserRole = UserRole.Student };
+    RegisterRequest model = new RegisterRequest() { UserRole = UserRole.Student, DepartmentId = 1 };
+    private List<DepartmentModel> Departments { get; set; } = new();
     bool isBusy = false;
     string message = string.Empty;
     Models.AlertMessageType messageType = Models.AlertMessageType.Success;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Departments = await _httpService.Get<List<DepartmentModel>>($"/api/auth/departments");
+        }
+        catch
+        {
+            Departments = new List<DepartmentModel>();
+        }
+    }
+
+
     public async Task RegisterUser()
     {
         isBusy = true;

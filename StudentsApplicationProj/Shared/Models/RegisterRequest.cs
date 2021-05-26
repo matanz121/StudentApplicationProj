@@ -24,5 +24,6 @@ namespace StudentsApplicationProj.Shared.Models
         [Compare(nameof(Password))]
         public string ConfirmPassword { get; set; }
         public UserRole UserRole { get; set; }
+        public int? DepartmentId { get; set; }
     }
 }

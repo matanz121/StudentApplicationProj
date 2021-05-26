@@ -105,7 +105,17 @@ namespace StudentsApplicationProj.Server.Migrations
                         new
                         {
                             Id = 1,
-                            DepartmentName = "Computer Science and Engineering"
+                            DepartmentName = "CSE"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DepartmentName = "EEE"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DepartmentName = "ME"
                         });
                 });
 
