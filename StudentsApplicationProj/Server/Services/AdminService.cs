@@ -66,7 +66,6 @@ namespace StudentsApplicationProj.Server.Services
         {
             try
             {
-                course.DepartmentId = 1;
                 _context.Course.Add(course);
                 _context.SaveChanges();
                 var instructor = _context.SystemUser
@@ -81,7 +80,7 @@ namespace StudentsApplicationProj.Server.Services
                         PlainText = "",
                         HtmlContent = $"<p> Admin has assigned you a new course {course.CourseName}</p>"
                     };
-                    _emailSenderService.SendEmail(emailModel);
+                    await _emailSenderService.SendEmail(emailModel);
                 }
                 return true;
             }

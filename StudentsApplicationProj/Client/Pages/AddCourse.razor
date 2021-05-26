@@ -11,11 +11,20 @@
         <MudCard>
             <DataAnnotationsValidator />
             <MudCardContent>
+                @if (Departments.Count > 0)
+                {
+                    <MudSelect T="int?" Label="Select Department" @bind-Value="departmentId" SelectedValuesChanged="OnDepartmentChange">
+                        @foreach (var dept in Departments)
+                        {
+                            <MudSelectItem Value="@dept.Id">@dept.DepartmentName</MudSelectItem>
+                        }
+                    </MudSelect>
+                }
                 <MudSelect Label="Select Instructor" @bind-Value="CourseModel.CourseInstructor.Id">
                     @foreach (var instructor in Instructors)
-                    {
+                        {
                         <MudSelectItem Value="@instructor.Id">@instructor.FirstName @instructor.LastName</MudSelectItem>
-                    }
+                        }
                 </MudSelect>
                 <MudTextField Label="Course Name" @bind-Value="CourseModel.CourseName" For="@(() => CourseModel.CourseName)" />
                 <MudTextField Label="Course Grade" @bind-Value="CourseModel.Grade" For="@(() => CourseModel.Grade)" />
@@ -31,11 +40,13 @@
 @code {
     private CourseModel CourseModel { get; set; } = new CourseModel()
     {
-        CourseInstructor = new()
+        CourseInstructor = new(),
+        Department = new()
     };
     private IList<UserAccountModel> Instructors = new List<UserAccountModel>();
+    private List<DepartmentModel> Departments { get; set; } = new();
     public bool IsLoading { get; set; }
-    private int departmentId = 1;
+    private int? departmentId = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,10 +54,12 @@
         {
             try
             {
-                Instructors = await _httpService.Get<List<UserAccountModel>>($"/api/admin/instructors/{departmentId}");
+                Departments = await _httpService.Get<List<DepartmentModel>>($"/api/auth/departments");
+                await OnDepartmentChange();
             }
             catch
             {
+                Departments = new List<DepartmentModel>();
                 Instructors = new List<UserAccountModel>();
             }
         }
@@ -60,6 +73,7 @@
     {
         try
         {
+            CourseModel.Department.Id = departmentId;
             await _httpService.Post<CourseModel>("/api/admin/course", CourseModel);
             _snackbar.Add("Successfully Added!", Severity.Success);
             CourseModel = new CourseModel()
@@ -71,5 +85,10 @@
         {
             _snackbar.Add("Something went wrong, please try again", Severity.Error);
         }
+    }
+
+    private async Task OnDepartmentChange()
+    {
+        Instructors = await _httpService.Get<List<UserAccountModel>>($"/api/admin/instructors/{departmentId}");
     }
 }

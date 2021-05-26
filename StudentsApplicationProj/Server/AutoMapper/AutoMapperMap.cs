@@ -36,6 +36,8 @@ namespace StudentsApplicationProj.Server.AutoMapper
             CreateMap<CourseModel, Course>()
                 .ForMember(dest => dest.Department, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseInstructorId, opt => opt.MapFrom(src => src.CourseInstructor.Id))
+                .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.Department.Id))
+                .ForMember(dest => dest.Department, opt => opt.Ignore())
                 .ForMember(dest => dest.CourseInstructor, opt => opt.Ignore());
 
             CreateMap<ApplicationRequestFormModel, CourseApplication>();

@@ -2,6 +2,7 @@
 using StudentsApplicationProj.Server.Models;
 using StudentsApplicationProj.Shared.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace StudentsApplicationProj.Server.Services
     {
         SystemUser Login(LoginRequest loginModel);
         Task<bool> Register(RegisterRequest registerModel);
+        Task<List<Department>> Departments();
     }
 
     public class AuthService : IAuthService
@@ -37,7 +39,7 @@ namespace StudentsApplicationProj.Server.Services
         {
             var user = new SystemUser
             {
-                DepartmentId = 1,
+                DepartmentId = registerModel.DepartmentId.Value,
                 Email = registerModel.Email,
                 Password = HashPassword(registerModel.Password),
                 FirstName = registerModel.FirstName,
@@ -63,6 +65,11 @@ namespace StudentsApplicationProj.Server.Services
             {
                 return false;
             }
+        }
+
+        public async Task<List<Department>> Departments()
+        {
+            return await _context.Department.ToListAsync();
         }
 
         private string HashPassword(string password)
