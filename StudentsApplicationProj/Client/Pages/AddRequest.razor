@@ -27,8 +27,8 @@
                             }
                     </MudSelect>
                 }
-                <MudTextField Label="Application Name" @bind-Value="ApplicationRequest.ApplicationName" For="@(() => ApplicationRequest.ApplicationName)" />
-                <MudTextField Label="Application Body" @bind-Value="ApplicationRequest.ApplicationBody" For="@(() => ApplicationRequest.ApplicationBody)" Lines="3" />
+                <MudTextField Label="Short Description" @bind-Value="ApplicationRequest.ApplicationName" For="@(() => ApplicationRequest.ApplicationName)" />
+                <MudTextField Label="Long Description" @bind-Value="ApplicationRequest.ApplicationBody" For="@(() => ApplicationRequest.ApplicationBody)" Lines="3" />
             </MudCardContent>
             <br />
             <MudCardActions>
