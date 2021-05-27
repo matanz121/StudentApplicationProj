@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentsApplicationProj.Server.Models;
 
 namespace StudentsApplicationProj.Server.Migrations
 {
     [DbContext(typeof(StudentDbContext))]
-    partial class StudentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210410132520_CreateTables")]
+    partial class CreateTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,9 +68,6 @@ namespace StudentsApplicationProj.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(128)");
 
-                    b.Property<string>("NoteMessage")
-                        .HasColumnType("nvarchar(MAX)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -105,17 +104,7 @@ namespace StudentsApplicationProj.Server.Migrations
                         new
                         {
                             Id = 1,
-                            DepartmentName = "CSE"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DepartmentName = "EEE"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            DepartmentName = "ME"
+                            DepartmentName = "Computer Science and Engineering"
                         });
                 });
 
@@ -126,24 +115,43 @@ namespace StudentsApplicationProj.Server.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CertificatePath")
-                        .HasColumnType("nvarchar(256)");
-
                     b.Property<int>("CourseApplicationId")
                         .HasColumnType("int");
 
-                    b.Property<string>("GradeSheetPath")
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(128)");
 
-                    b.Property<string>("SyllabusPath")
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(258)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseApplicationId")
-                        .IsUnique();
+                    b.HasIndex("CourseApplicationId");
 
                     b.ToTable("FileUrl");
+                });
+
+            modelBuilder.Entity("StudentsApplicationProj.Server.Models.InstructorCourse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InstructorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("InstructorId");
+
+                    b.ToTable("InstructorCourse");
                 });
 
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.StudentCourse", b =>
@@ -256,12 +264,31 @@ namespace StudentsApplicationProj.Server.Migrations
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.FileUrl", b =>
                 {
                     b.HasOne("StudentsApplicationProj.Server.Models.CourseApplication", "CourseApplication")
-                        .WithOne("FileUrls")
-                        .HasForeignKey("StudentsApplicationProj.Server.Models.FileUrl", "CourseApplicationId")
+                        .WithMany("FileUrls")
+                        .HasForeignKey("CourseApplicationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CourseApplication");
+                });
+
+            modelBuilder.Entity("StudentsApplicationProj.Server.Models.InstructorCourse", b =>
+                {
+                    b.HasOne("StudentsApplicationProj.Server.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("StudentsApplicationProj.Server.Models.SystemUser", "Instructor")
+                        .WithMany()
+                        .HasForeignKey("InstructorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Instructor");
                 });
 
             modelBuilder.Entity("StudentsApplicationProj.Server.Models.StudentCourse", b =>

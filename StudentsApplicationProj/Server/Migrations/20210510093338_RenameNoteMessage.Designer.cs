@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudentsApplicationProj.Server.Models;
 
 namespace StudentsApplicationProj.Server.Migrations
 {
     [DbContext(typeof(StudentDbContext))]
-    partial class StudentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210510093338_RenameNoteMessage")]
+    partial class RenameNoteMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,17 +107,7 @@ namespace StudentsApplicationProj.Server.Migrations
                         new
                         {
                             Id = 1,
-                            DepartmentName = "CSE"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DepartmentName = "EEE"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            DepartmentName = "ME"
+                            DepartmentName = "Computer Science and Engineering"
                         });
                 });
 
