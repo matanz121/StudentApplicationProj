@@ -12,15 +12,22 @@ namespace StudentsApplicationProj.Server.Controllers
     public class DepartmentHeadController : ControllerBase
     {
         private readonly IDepartmentHeadService _departmentHeadService;
-        public DepartmentHeadController(IDepartmentHeadService departmentHeadService)
+        private readonly ITokenService _tokenService;
+        public DepartmentHeadController(IDepartmentHeadService departmentHeadService, ITokenService tokenService)
         {
             _departmentHeadService = departmentHeadService;
+            _tokenService = tokenService;
         }
 
         [HttpPost, Route("acceptOrDecline")]
         public async Task<IActionResult> AcceptOrDeclineApplication(CourseApplicationViewModel application)
         {
-            bool status = await _departmentHeadService.AcceptOrDeclineApplication(application.Id, application.Status, application.NoteMessage);
+            var userInfo = _tokenService.GetUserInfoFromToken(Request);
+            if(userInfo == null || userInfo.UserId <= 0)
+            {
+                return Unauthorized();
+            }
+            bool status = await _departmentHeadService.AcceptOrDeclineApplication(userInfo.UserId, application.Id, application.Status, application.NoteMessage);
             if (status)
             {
                 return Ok(application);

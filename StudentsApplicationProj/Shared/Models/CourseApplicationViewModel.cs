@@ -14,5 +14,6 @@ namespace StudentsApplicationProj.Shared.Models
         public DateTime? ApplicationDateTime { get; set; }
         public FileUrlModel FileUrls { get; set; }
         public string NoteMessage { get; set; }
+        public string NoteFrom { get; set; }
     }
 }

@@ -14,5 +14,6 @@ namespace StudentsApplicationProj.Server.Models
         public StudentCourse StudentCourse { get; set; }
         public int StudentCourseId { get; set; }
         public string NoteMessage { get; set; }
+        public string NoteFrom { get; set; }
     }
 }

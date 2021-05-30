@@ -12,15 +12,22 @@ namespace StudentsApplicationProj.Server.Controllers
     public class InstructorController : ControllerBase
     {
         private readonly IInstructorService _instructorService;
-        public InstructorController(IInstructorService instructorService)
+        private readonly ITokenService _tokenService;
+        public InstructorController(IInstructorService instructorService, ITokenService tokenService)
         {
             _instructorService = instructorService;
+            _tokenService = tokenService;
         }
 
         [HttpPost, Route("acceptOrDecline")]
         public async Task<IActionResult> AcceptOrDeclineApplication(CourseApplicationViewModel application)
         {
-            bool status = await _instructorService.AcceptOrDeclineApplication(application.Id, application.Status, application.NoteMessage);
+            var userInfo = _tokenService.GetUserInfoFromToken(Request);
+            if (userInfo == null || userInfo.UserId <= 0)
+            {
+                return Unauthorized();
+            }
+            bool status = await _instructorService.AcceptOrDeclineApplication(userInfo.UserId, application.Id, application.Status, application.NoteMessage);
             if (status)
             {
                 return Ok(application);
