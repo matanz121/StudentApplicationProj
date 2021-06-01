@@ -10,7 +10,7 @@ namespace StudentsApplicationProj.Server.Services
     public interface IDepartmentHeadService
     {
         List<StudentCourse> GetApplicationList(int departmentHeadId);
-        Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status, string message);
+        Task<bool> AcceptOrDeclineApplication(int departmentHeadId, int applicationId, ApplicationStatus status, string message);
     }
 
     public class DepartmentHeadService : IDepartmentHeadService
@@ -24,10 +24,11 @@ namespace StudentsApplicationProj.Server.Services
             _emailSenderService = emailSenderService;
         }
 
-        public async Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status, string message)
+        public async Task<bool> AcceptOrDeclineApplication(int departmentHeadId, int applicationId, ApplicationStatus status, string message)
         {
             if(status == ApplicationStatus.ApprovedByAll || status == ApplicationStatus.Declined)
             {
+                var deptHead = _context.SystemUser.Where(x => x.Id == departmentHeadId).FirstOrDefault();
                 var application = _context.CourseApplication
                 .Where(x => x.Id == applicationId)
                 .Include(x => x.StudentCourse)
@@ -41,6 +42,7 @@ namespace StudentsApplicationProj.Server.Services
                     {
                         application.Status = status;
                         application.NoteMessage = message;
+                        application.NoteFrom = deptHead.FirstName;
                         await _context.SaveChangesAsync();
                         if(application.StudentCourse.Course != null && application.StudentCourse.Student != null)
                         {

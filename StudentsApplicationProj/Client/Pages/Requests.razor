@@ -74,6 +74,11 @@
 </MudTable>
 
 <MudDialog @bind-IsVisible="IsViewNote">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            @NoteFrom
+        </MudText>
+    </TitleContent>
     <DialogContent>
         @NoteMessage
     </DialogContent>
@@ -103,6 +108,7 @@
     private bool IsAccept { get; set; }
     private bool IsLoading { get; set; }
     public string NoteMessage { get; set; }
+    public string NoteFrom { get; set; }
     public bool IsViewNote { get; set; }
     public bool IsAddNote { get; set; }
 
@@ -168,6 +174,7 @@
     {
         var application = ApplicationRequests.Find(x => x.Id == applicationId);
         NoteMessage = application.NoteMessage;
+        NoteFrom = application.NoteFrom;
         IsViewNote = true;
     }
 

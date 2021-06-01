@@ -27,6 +27,7 @@ namespace StudentsApplicationProj.Server.AutoMapper
                 .ForMember(dest => dest.ApplicationDateTime, opt => opt.MapFrom(src => src.CourseApplication.ApplicationDateTime))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.CourseApplication.Status))
                 .ForMember(dest => dest.NoteMessage, opt => opt.MapFrom(src => src.CourseApplication.NoteMessage))
+                .ForMember(dest => dest.NoteFrom, opt => opt.MapFrom(src => src.CourseApplication.NoteFrom))
                 .ForMember(dest => dest.FileUrls, opt => opt.MapFrom(src => src.CourseApplication.FileUrls));
 
             CreateMap<FileUrlModel, FileUrl>();

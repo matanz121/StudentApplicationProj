@@ -11,7 +11,7 @@ namespace StudentsApplicationProj.Server.Services
     public interface IInstructorService
     {
         List<StudentCourse> GetApplicationList(int instructorId);
-        Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status, string message);
+        Task<bool> AcceptOrDeclineApplication(int instructorId, int applicationId, ApplicationStatus status, string message);
     }
 
     public class InstructorService : IInstructorService
@@ -24,10 +24,11 @@ namespace StudentsApplicationProj.Server.Services
             _emailSenderService = emailSenderService;
         }
 
-        public async Task<bool> AcceptOrDeclineApplication(int applicationId, ApplicationStatus status, string message)
+        public async Task<bool> AcceptOrDeclineApplication(int instructorId, int applicationId, ApplicationStatus status, string message)
         {
             if (status == ApplicationStatus.ApprovedByInstructor || status == ApplicationStatus.Declined)
             {
+                var instructor = _context.SystemUser.Where(x => x.Id == instructorId).FirstOrDefault();
                 var application = _context.CourseApplication
                 .Where(x => x.Id == applicationId)
                 .Include(x => x.StudentCourse)
@@ -41,6 +42,7 @@ namespace StudentsApplicationProj.Server.Services
                     {
                         application.Status = status;
                         application.NoteMessage = message;
+                        application.NoteFrom = instructor.FirstName;
                         await _context.SaveChangesAsync();
                         if(application.StudentCourse.Course != null && application.StudentCourse.Student != null)
                         {
