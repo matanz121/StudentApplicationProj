@@ -33,15 +33,15 @@
         <MudTh>
             @if (context.FileUrls != null && context.FileUrls.CertificatePath != null)
             {
-                <a href="/files/{@context.FileUrls.CertificatePath}" target="_blank">@context.FileUrls.CertificatePath</a> <br />
+                <a href="/files/{@context.FileUrls.CertificatePath}" target="_blank" download>@context.FileUrls.CertificatePath</a> <br />
             }
             @if (context.FileUrls != null && context.FileUrls.SyllabusPath != null)
             {
-                <a href=@($"/files/{@context.FileUrls.SyllabusPath}") target="_blank">@context.FileUrls.SyllabusPath</a> <br />
+                <a href=@($"/files/{@context.FileUrls.SyllabusPath}") target="_blank" download>@context.FileUrls.SyllabusPath</a> <br />
             }
             @if (context.FileUrls != null && context.FileUrls.GradeSheetPath != null)
             {
-                <a href=@($"/files/{@context.FileUrls.GradeSheetPath}") target="_blank">@context.FileUrls.GradeSheetPath</a>
+                <a href=@($"/files/{@context.FileUrls.GradeSheetPath}") target="_blank" download>@context.FileUrls.GradeSheetPath</a>
             }
         </MudTh>
         <MudTd>@context.ApplicationDateTime</MudTd>
