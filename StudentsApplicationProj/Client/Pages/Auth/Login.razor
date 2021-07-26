@@ -7,7 +7,7 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
 <div style="max-width: 400px;">
-    <h3>Create a new user</h3>
+    <h3>Login to the system</h3>
     <EditForm Model="@model" OnValidSubmit="LoginUser">
         <MudCard>
             <AlertMessage Message="@message" MessageType="@messageType" />
@@ -46,7 +46,7 @@
         }
         catch
         {
-            message = "Wrong email password combination";
+            message = "Wrong email password combination OR user not approved";
             messageType = Models.AlertMessageType.Error;
         }
         finally
